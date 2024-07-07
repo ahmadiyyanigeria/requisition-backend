@@ -29,3 +29,4 @@ ENV ASPNETCORE_URLS=http://*:8080
 COPY --from=publish /app/publish .
 EXPOSE 8080/tcp
 ENTRYPOINT ["dotnet", "Api.dll"]
+
