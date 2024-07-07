@@ -1,0 +1,109 @@
+name: .NET Core Build, Test, and Docker Publish
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+      - feature/*
+      - release/*
+      - hotfix/*
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '7.x' # Adjust based on your .NET version
+
+    - name: Install dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --configuration Release
+
+    - name: Publish
+      run: dotnet publish --configuration Release --output ./publish
+
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '7.x' # Adjust based on your .NET version
+
+    - name: Install dependencies
+      run: dotnet restore
+
+    - name: Run Unit Tests
+      run: dotnet test --configuration Release --logger trx --results-directory ./TestResults
+
+    - name: Publish Test Results
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results
+        path: ./TestResults
+
+    - name: Generate Test Coverage
+      run: |
+        dotnet tool install -g dotnet-reportgenerator-globaltool
+        dotnet test --configuration Release /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=./TestResults/Coverage/
+        reportgenerator -reports:./TestResults/Coverage/coverage.cobertura.xml -targetdir:./TestResults/Coverage/Report -reporttypes:Html
+
+    - name: Publish Code Coverage Results
+      uses: actions/upload-artifact@v3
+      with:
+        name: code-coverage
+        path: ./TestResults/Coverage/Report
+
+  docker-publish:
+    runs-on: ubuntu-latest
+    needs: test
+    if: success()
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        file: ./Dockerfile
+        push: true
+        tags: |
+          ${{ secrets.DOCKER_USERNAME }}/web-backend:latest
+          ${{ secrets.DOCKER_USERNAME }}/web-backend:${{ github.sha }}
+
+    - name: Publish Docker Compose and Image Manifest
+      run: |
+        cp ./docker-compose-release.yml ${{ github.workspace }}/docker-compose-web-backend.yml
+        echo "Image: ${{ secrets.DOCKER_USERNAME }}/web-backend:latest" > ${{ github.workspace }}/image-manifest.txt
+        echo "Build: ${{ github.sha }}" >> ${{ github.workspace }}/image-manifest.txt
+      continue-on-error: true
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: dockerArtifact
+        path: ${{ github.workspace }}
