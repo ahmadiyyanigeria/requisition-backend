@@ -3,7 +3,7 @@ name: .NET Core Build, Test, and Docker Publish
 on:
   pull_request:
     branches:
-      - main
+      - master
       - develop
       - feature/*
       - release/*
