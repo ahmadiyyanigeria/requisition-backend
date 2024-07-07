@@ -56,18 +56,6 @@ jobs:
         name: test-results
         path: ./TestResults
 
-    - name: Generate Test Coverage
-      run: |
-        dotnet tool install -g dotnet-reportgenerator-globaltool
-        dotnet test --configuration Release /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=./TestResults/Coverage/
-        reportgenerator -reports:./TestResults/Coverage/coverage.cobertura.xml -targetdir:./TestResults/Coverage/Report -reporttypes:Html
-
-    - name: Publish Code Coverage Results
-      uses: actions/upload-artifact@v3
-      with:
-        name: code-coverage
-        path: ./TestResults/Coverage/Report
-
   docker-publish:
     runs-on: ubuntu-latest
     needs: test
