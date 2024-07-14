@@ -11,7 +11,6 @@
     <Folder Include="Aggregates\GrantAggregate\" />
     <Folder Include="Aggregates\SubmitterAggregate\" />
     <Folder Include="Aggregates\PurchaseOrderAggregate\" />
-    <Folder Include="Aggregates\RequisitionAggregate\" />
     <Folder Include="Entities\" />
     <Folder Include="ValueObjects\" />
   </ItemGroup>
