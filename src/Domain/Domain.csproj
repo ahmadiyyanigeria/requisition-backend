@@ -7,8 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="Aggregates\CashAdvanceAggregate\" />
+    <Folder Include="Aggregates\GrantAggregate\" />
+    <Folder Include="Aggregates\SubmitterAggregate\" />
+    <Folder Include="Aggregates\PurchaseOrderAggregate\" />
+    <Folder Include="Aggregates\RequisitionAggregate\" />
     <Folder Include="Entities\" />
-    <Folder Include="Enums\" />
+    <Folder Include="ValueObjects\" />
   </ItemGroup>
 
 </Project>
