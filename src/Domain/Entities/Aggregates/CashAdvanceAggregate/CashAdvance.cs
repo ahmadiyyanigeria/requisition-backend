@@ -10,19 +10,21 @@ namespace Domain.Entities.Aggregates.CashAdvanceAggregate
         public Guid RequisitionId { get; private set; }
         public Guid SubmitterId { get; private set; }
         public decimal AdvanceAmount { get; private set; }
+        public string AccountNumber { get; private set; }
         public BankAccount BankAccount { get; private set; }
         public CashAdvanceStatus Status { get; private set; }
         public RetirementEntry RetirementEntry { get; private set; }
         public RefundEntry RefundEntry { get; private set; }
         public ReimbursementEntry ReimbursementEntry { get; private set; }
 
-        public CashAdvance(Guid requisitionId, Guid submitterId, decimal advanceAmount, BankAccount bankAccount)
+        private CashAdvance() { }
+        public CashAdvance(Guid requisitionId, Guid submitterId, decimal advanceAmount, string accountNumber)
         {
             CashAdvanceId = Guid.NewGuid();
             RequisitionId = requisitionId;
             SubmitterId = submitterId;
             AdvanceAmount = advanceAmount;
-            BankAccount = bankAccount;
+            AccountNumber = accountNumber;
             Status = CashAdvanceStatus.Requested;
         }
 

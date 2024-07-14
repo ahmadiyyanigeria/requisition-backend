@@ -1,6 +1,5 @@
 ﻿using Domain.Entities.Common;
 using Domain.Enums;
-using System.Data;
 
 namespace Domain.Entities.Aggregates.RequisitionAggregate
 {
@@ -9,16 +8,19 @@ namespace Domain.Entities.Aggregates.RequisitionAggregate
         public Guid ApprovalStepId { get; private set; }
         public Guid ApproverId { get; private set; }
         public ApprovalFlow ApprovalFlow { get; private set; }
-        public List<Role> ApproverRole { get; private set; }
         public ApprovalStatus Status { get; private set; }
         public DateTime ApprovalDate { get; private set; }
         public string Notes { get; private set; }
+        private readonly List<Role> _approvalRoles;
 
-        public ApprovalStep(Guid approverId, List<Role> approverRole)
+        public IReadOnlyList<Role> ApprovalRoles => _approvalRoles.AsReadOnly();
+
+        private ApprovalStep() { }
+        public ApprovalStep(Guid approverId, List<Role> approverRoles)
         {
             ApprovalStepId = Guid.NewGuid();
             ApproverId = approverId;
-            ApproverRole = approverRole;
+            _approvalRoles = approverRoles ?? new List<Role>();
             Status = ApprovalStatus.Pending;
         }
 

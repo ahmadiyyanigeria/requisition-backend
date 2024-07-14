@@ -10,6 +10,7 @@ namespace Domain.Entities.Aggregates.PurchaseOrderAggregate
         public PaymentMethod PaymentMethod { get; private set; }
         public string ReferenceNumber { get; private set; }
 
+        private Payment() { }
         public Payment(decimal amount, PaymentMethod paymentMethod, string referenceNumber)
         {
             PaymentId = Guid.NewGuid();

@@ -1,24 +1,25 @@
-﻿using Domain.Entities.Aggregates.RequisitionAggregate;
+﻿using Domain.Entities.Common;
 
 namespace Domain.Entities.Aggregates.CashAdvanceAggregate
 {
     public class ReimbursementEntry
     {
-        public Guid ReimbursementEntryId { get; private set; }
+        public Guid ReimbursementEntryId { get; private set; } = Guid.NewGuid();
         public Guid CashAdvanceId { get; private set; }
         public string Description { get; private set; }
         public decimal Amount { get; private set; }
-        public DateTime Date { get; private set; }
+        public DateTime Date { get; private set; } = DateTime.UtcNow;
+        public Guid AttachmentId { get; private set; }
         public Attachment Receipt { get; private set; }
 
-        public ReimbursementEntry(Guid cashAdvanceId, string description, decimal amount, Attachment receipt)
+        private ReimbursementEntry() { }
+
+        public ReimbursementEntry(Guid cashAdvanceId, string description, decimal amount, Guid receiptId)
         {
-            ReimbursementEntryId = Guid.NewGuid();
             CashAdvanceId = cashAdvanceId;
             Description = description;
             Amount = amount;
-            Date = DateTime.UtcNow;
-            Receipt = receipt;
+            AttachmentId = receiptId;
         }
     }
 }

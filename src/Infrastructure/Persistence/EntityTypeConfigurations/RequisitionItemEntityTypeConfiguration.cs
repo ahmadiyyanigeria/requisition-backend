@@ -14,7 +14,11 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
 
             builder.Property(e => e.RequisitionItemId)
                 .HasColumnName("requisition_item_id")
-                .ValueGeneratedNever(); 
+                .ValueGeneratedNever();
+
+            builder.Property(e => e.RequisitionId)
+                .IsRequired()
+                .HasColumnName("requisition_id");
 
             builder.Property(e => e.Description)
                 .IsRequired()

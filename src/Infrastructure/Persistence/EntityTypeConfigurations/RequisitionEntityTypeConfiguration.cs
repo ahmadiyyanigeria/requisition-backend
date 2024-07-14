@@ -44,43 +44,6 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
                 .IsRequired()
                 .HasColumnName("total_amount");
 
-            // Configure navigation properties and owned entities
-            builder.OwnsOne(e => e.ApprovalFlow, approvalFlow =>
-            {
-                approvalFlow.ToTable("approval_flows"); // Optional: Specify table name if different
-                approvalFlow.Property<Guid>("RequisitionId").HasColumnName("requisition_id"); // Shadow property
-                approvalFlow.WithOwner().HasForeignKey("RequisitionId");
-            });
-
-            builder.OwnsOne(e => e.BankAccount, bankAccount =>
-            {
-                bankAccount.Property<Guid>("RequisitionId").HasColumnName("requisition_id"); // Shadow property
-                bankAccount.WithOwner().HasForeignKey("RequisitionId");
-            });
-
-            // Configure Items as owned collection (if using JSONB approach, omit if using separate entity)
-            builder.OwnsMany(e => e.Items, items =>
-            {
-                items.WithOwner().HasForeignKey("RequisitionId");
-                items.Property<int>("ItemId").HasColumnName("item_id");
-                items.HasKey("RequisitionId", "ItemId");
-                items.Property(item => item.Description).HasColumnName("item_description");
-                items.Property(item => item.Quantity).HasColumnName("quantity");
-                items.Property(item => item.UnitPrice).HasColumnName("unit_price");
-            });
-
-            // Configure Attachments as owned entity collection
-            builder.OwnsMany(e => e.Attachments, attachments =>
-            {
-                attachments.WithOwner().HasForeignKey("RequisitionId");
-                attachments.Property<Guid>("AttachmentId").HasColumnName("attachment_id");
-                attachments.HasKey("RequisitionId", "AttachmentId");
-                attachments.Property(att => att.FileName).HasColumnName("file_name").HasColumnType("varchar(255)"); // Example type
-                attachments.Property(att => att.FileType).HasColumnName("file_type").HasColumnType("varchar(50)"); // Example type
-                attachments.Property(att => att.FileContent).HasColumnName("file_content").HasColumnType("text");
-            });
-
-            // Configure other properties like ExpenseAccountId, RequisitionType, Department, etc.
             builder.Property(e => e.ExpenseAccountId)
                 .IsRequired()
                 .HasColumnName("expense_account_id");
@@ -93,6 +56,27 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
             builder.Property(e => e.Department)
                 .HasMaxLength(100)
                 .HasColumnName("department");
+
+            // Configure ApprovalFlow as a separate entity
+            builder.HasOne(e => e.ApprovalFlow)
+                .WithOne()
+                .HasForeignKey<ApprovalFlow>(e => e.RequisitionId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict); 
+
+            // Configure RequisitionItems as a collection
+            builder.HasMany(e => e.Items)
+                .WithOne()
+                .HasForeignKey(item => item.RequisitionId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Configure BankAccount as a separate entity
+            builder.HasOne(e => e.BankAccount)
+                .WithMany()
+                .HasForeignKey(e => e.AccountNumber)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict); 
         }
     }
 }

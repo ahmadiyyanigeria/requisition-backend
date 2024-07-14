@@ -1,4 +1,4 @@
-﻿using Domain.Entities.Aggregates.RequisitionAggregate;
+﻿using Domain.Entities.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,24 +10,30 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
         {
             builder.ToTable("attachments");
 
-            builder.HasKey(e => e.AttachmentId);
+            builder.HasKey(a => a.AttachmentId);
 
-            builder.Property(e => e.AttachmentId)
+            builder.Property(a => a.AttachmentId)
                 .HasColumnName("attachment_id")
-                .ValueGeneratedNever();
+                .ValueGeneratedNever(); 
 
-            builder.Property(e => e.FileName)
+            builder.Property(a => a.FileName)
                 .IsRequired()
                 .HasColumnName("file_name")
-                .HasColumnType("varchar(255)"); // Adjust type as per your needs
+                .HasColumnType("varchar(255)");
 
-            builder.Property(e => e.FileType)
+            builder.Property(a => a.FileType)
+                .IsRequired()
                 .HasColumnName("file_type")
-                .HasColumnType("varchar(50)"); // Adjust type as per your needs
+                .HasColumnType("varchar(50)");
 
-            builder.Property(e => e.FileContent)
+            builder.Property(a => a.FileContent)
+                .IsRequired()
                 .HasColumnName("file_content")
-                .HasColumnType("varchar(255)"); 
+                .HasColumnType("text");
+
+            builder.Property(a => a.UploadedDate)
+                .IsRequired()
+                .HasColumnName("uploaded_date");
         }
     }
 }

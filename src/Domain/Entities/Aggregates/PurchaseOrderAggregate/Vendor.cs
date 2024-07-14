@@ -12,6 +12,7 @@ namespace Domain.Entities.Aggregates.PurchaseOrderAggregate
         public string ContactPhone { get; private set; }
         public BankAccount BankAccountDetails { get; private set; }
 
+        private Vendor() { }
         public Vendor(string name, string address, string contactPerson, string contactEmail, string contactPhone, BankAccount bankAccountDetails)
         {
             VendorId = Guid.NewGuid();

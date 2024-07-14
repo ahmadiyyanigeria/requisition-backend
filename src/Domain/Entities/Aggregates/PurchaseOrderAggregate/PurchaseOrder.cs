@@ -1,4 +1,4 @@
-﻿using Domain.Entities.Aggregates.RequisitionAggregate;
+﻿using Domain.Entities.Common;
 using Domain.Enums;
 
 namespace Domain.Entities.Aggregates.PurchaseOrderAggregate
@@ -20,6 +20,7 @@ namespace Domain.Entities.Aggregates.PurchaseOrderAggregate
         public IReadOnlyList<PurchaseOrderItem> Items => _items.AsReadOnly();
         public IReadOnlyList<Payment> Payments => _payments.AsReadOnly();
 
+        private PurchaseOrder() { }
         public PurchaseOrder(Guid requisitionId, Guid vendorId, Vendor vendor)
         {
             PurchaseOrderId = Guid.NewGuid();

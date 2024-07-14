@@ -8,21 +8,17 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
     {
         public void Configure(EntityTypeBuilder<ApprovalStep> builder)
         {
-            builder.ToTable("approval_steps"); 
+            builder.ToTable("approval_steps");
 
             builder.HasKey(e => e.ApprovalStepId);
 
             builder.Property(e => e.ApprovalStepId)
                 .HasColumnName("approval_step_id")
-                .ValueGeneratedNever(); 
+                .ValueGeneratedNever();
 
             builder.Property(e => e.ApproverId)
                 .IsRequired()
                 .HasColumnName("approver_id");
-
-            builder.Property(e => e.ApproverRole)
-                .IsRequired()
-                .HasColumnName("approver_role");
 
             builder.Property(e => e.Status)
                 .IsRequired()
@@ -34,7 +30,19 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
 
             builder.Property(e => e.Notes)
                 .HasColumnName("notes")
-                .HasColumnType("text"); // Assuming Notes can be lengthy
+                .HasColumnType("text");
+
+            // Configure the navigation property for ApprovalFlow
+            builder.HasOne(e => e.ApprovalFlow)
+                .WithMany()
+                .HasForeignKey("ApprovalFlowId")
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Configure the collection of roles
+            builder.HasMany(e => e.ApprovalRoles)
+                .WithOne()
+                .HasForeignKey("ApprovalStepId")
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

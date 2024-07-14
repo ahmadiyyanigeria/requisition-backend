@@ -20,10 +20,10 @@ public class ApplicationDbContext : DbContext
     public DbSet<Vendor> Vendors { get; set; }
 
     // DbSet for CashAdvance aggregate
-    public DbSet<CashAdvance> CashAdvances { get; set; }
-    public DbSet<RetirementEntry> RetirementEntries { get; set; }
-    public DbSet<RefundEntry> RefundEntries { get; set; }
-    public DbSet<ReimbursementEntry> ReimbursementEntries { get; set; }
+    /* public DbSet<CashAdvance> CashAdvances { get; set; }
+     public DbSet<RetirementEntry> RetirementEntries { get; set; }
+     public DbSet<RefundEntry> RefundEntries { get; set; }
+     public DbSet<ReimbursementEntry> ReimbursementEntries { get; set; }*/
 
     // DbSet for Grant aggregate
     public DbSet<Grant> Grants { get; set; }

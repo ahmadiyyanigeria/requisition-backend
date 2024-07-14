@@ -1,11 +1,18 @@
 ﻿namespace Domain.Entities.Aggregates.RequisitionAggregate
 {
-    public class ApprovalFlow(Guid requisitionId, LinkedList<ApprovalStep> approvers)
+    public class ApprovalFlow
     {
         public Guid ApprovalFlowId { get; private set; } = Guid.NewGuid();
-        public Guid RequisitionId { get; private set; } = requisitionId;
-        public LinkedList<ApprovalStep> Approvers { get; private set; } = approvers;
+        public Guid RequisitionId { get; private set; }
+        public LinkedList<ApprovalStep> Approvers { get; private set; }
         public int CurrentStep { get; private set; } = 0;
+
+        private ApprovalFlow() { }
+        public ApprovalFlow(Guid requisitionId, LinkedList<ApprovalStep> approvers)
+        {
+            RequisitionId = requisitionId;
+            Approvers = approvers;
+        }
 
         public void MoveToNextStep()
         {

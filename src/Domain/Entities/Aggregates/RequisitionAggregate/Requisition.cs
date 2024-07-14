@@ -1,8 +1,5 @@
 ﻿using Domain.Entities.Common;
 using Domain.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Domain.Entities.Aggregates.RequisitionAggregate
 {
@@ -19,8 +16,9 @@ namespace Domain.Entities.Aggregates.RequisitionAggregate
         public ApprovalFlow ApprovalFlow { get; private set; }
         public Guid ExpenseAccountId { get; private set; }
         public RequisitionType RequisitionType { get; private set; }
+        public string AccountNumber { get; private set; }
         public BankAccount BankAccount { get; private set; }
-        public string Department { get; private set; }
+        public string Department { get; private set; }//seek clarification
 
         private readonly List<RequisitionItem> _items = [];
         private readonly List<Attachment> _attachments = [];
@@ -28,13 +26,13 @@ namespace Domain.Entities.Aggregates.RequisitionAggregate
         public IReadOnlyList<Attachment> Attachments => _attachments.AsReadOnly();
         public IReadOnlyList<RequisitionItem> Items => _items.AsReadOnly();
 
-        public Requisition(Guid submitterId, string description, Guid expenseAccountId, RequisitionType requisitionType, BankAccount bankAccount, string department)
+        public Requisition(Guid submitterId, string description, Guid expenseAccountId, RequisitionType requisitionType, string accountNumber, string department)
         {
             SubmitterId = submitterId;
             Description = description;
             ExpenseAccountId = expenseAccountId;
             RequisitionType = requisitionType;
-            BankAccount = bankAccount;
+            AccountNumber = accountNumber;
             Department = department ?? "Default Department"; // Assuming you have a method to get the default department of the submitter
         }
 

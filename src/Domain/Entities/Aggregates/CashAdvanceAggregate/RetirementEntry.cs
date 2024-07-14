@@ -1,4 +1,4 @@
-﻿using Domain.Entities.Aggregates.RequisitionAggregate;
+﻿using Domain.Entities.Common;
 
 namespace Domain.Entities.Aggregates.CashAdvanceAggregate
 {
@@ -12,6 +12,7 @@ namespace Domain.Entities.Aggregates.CashAdvanceAggregate
         public Attachment Receipt { get; private set; }
         public string Type => "Expense";
 
+        private RetirementEntry() { }
         public RetirementEntry(Guid cashAdvanceId, string description, decimal amount, Attachment receipt)
         {
             RetirementEntryId = Guid.NewGuid();
