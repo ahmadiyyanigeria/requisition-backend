@@ -2,5 +2,8 @@
 {
     public enum GrantStatus
     {
+        Requested,
+        Approved,
+        Disbursed
     }
 }

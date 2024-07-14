@@ -2,5 +2,8 @@
 {
     public enum RequisitionType
     {
+        PurchaseOrder,
+        CashAdvance,
+        Grant
     }
 }
