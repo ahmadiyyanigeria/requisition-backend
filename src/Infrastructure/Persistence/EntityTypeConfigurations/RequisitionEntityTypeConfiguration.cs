@@ -77,6 +77,7 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
                 .HasForeignKey(e => e.AccountNumber)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict); 
+
         }
     }
 }
