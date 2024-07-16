@@ -19,7 +19,7 @@ namespace Infrastructure.Persistence.Repositories
             return requisition;
         }
 
-        public Requisition Update(Requisition requisition)
+        public async Task<Requisition> UpdateAsync(Requisition requisition)
         {
             _context.Requisitions.Update(requisition);
             return requisition;
