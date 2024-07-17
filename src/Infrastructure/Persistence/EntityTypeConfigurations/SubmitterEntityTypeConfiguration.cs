@@ -1,11 +1,6 @@
 ﻿using Domain.Entities.Aggregates.SubmitterAggregate;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Persistence.EntityTypeConfigurations
 {
@@ -38,7 +33,7 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
             {
                 bankAccount.Property(b => b.AccountNumber).HasMaxLength(20).IsRequired();
                 bankAccount.Property(b => b.BankName).HasMaxLength(100).IsRequired();
-                bankAccount.Property(b => b.AccountName).HasMaxLength(10).IsRequired();
+                bankAccount.Property(b => b.AccountName).HasMaxLength(100).IsRequired();
             });
 
             builder.HasMany(s => s.Requisitions)
