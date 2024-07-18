@@ -31,18 +31,6 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
             builder.Property(e => e.Notes)
                 .HasColumnName("notes")
                 .HasColumnType("text");
-
-            // Configure the navigation property for ApprovalFlow
-            builder.HasOne(e => e.ApprovalFlow)
-                .WithMany()
-                .HasForeignKey("ApprovalFlowId")
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure the collection of roles
-            builder.HasMany(e => e.ApprovalRoles)
-                .WithOne()
-                .HasForeignKey("ApprovalStepId")
-                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
