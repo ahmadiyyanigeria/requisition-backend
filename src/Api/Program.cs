@@ -1,5 +1,7 @@
 using Api.Extensions;
+using Application.Configurations;
 using Infrastructure.Extensions;
+using Microsoft.Extensions.Configuration;
 using Prometheus;
 using Serilog;
 
@@ -15,6 +17,7 @@ builder.Services.AddControllers();
 builder.Services.AddApplicationServices();
 builder.Services.AddDatabase(configuration);
 
+builder.Services.Configure<ApprovalFlowConfiguration>(builder.Configuration.GetSection("ApprovalFlows"));
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

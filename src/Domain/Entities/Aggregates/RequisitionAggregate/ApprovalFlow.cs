@@ -8,6 +8,7 @@
         public int CurrentStep { get; private set; } = 0;
 
         private ApprovalFlow() { }
+
         public ApprovalFlow(Guid requisitionId, LinkedList<ApprovalStep> approvers)
         {
             RequisitionId = requisitionId;
@@ -25,6 +26,11 @@
         public ApprovalStep GetCurrentApprover()
         {
             return Approvers.ElementAt(CurrentStep);
+        }
+
+        public bool IsFinalStep()
+        {
+            return CurrentStep >= Approvers.Count - 1;
         }
     }
 }

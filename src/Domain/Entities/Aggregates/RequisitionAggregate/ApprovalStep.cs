@@ -1,5 +1,4 @@
-﻿using Domain.Entities.Common;
-using Domain.Enums;
+﻿using Domain.Enums;
 
 namespace Domain.Entities.Aggregates.RequisitionAggregate
 {
@@ -11,16 +10,17 @@ namespace Domain.Entities.Aggregates.RequisitionAggregate
         public ApprovalStatus Status { get; private set; }
         public DateTime ApprovalDate { get; private set; }
         public string Notes { get; private set; }
-        private readonly List<Role> _approvalRoles;
+        private readonly List<string> _approvalRoles;
 
-        public IReadOnlyList<Role> ApprovalRoles => _approvalRoles.AsReadOnly();
+        public IReadOnlyList<string> ApprovalRoles => _approvalRoles.AsReadOnly();
 
         private ApprovalStep() { }
-        public ApprovalStep(Guid approverId, List<Role> approverRoles)
+
+        public ApprovalStep(Guid approverId, List<string> approverRoles)
         {
             ApprovalStepId = Guid.NewGuid();
             ApproverId = approverId;
-            _approvalRoles = approverRoles ?? new List<Role>();
+            _approvalRoles = approverRoles ?? [];
             Status = ApprovalStatus.Pending;
         }
 
