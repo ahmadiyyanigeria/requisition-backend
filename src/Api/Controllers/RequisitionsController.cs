@@ -16,15 +16,10 @@ namespace Api.Controllers
         }
 
         [HttpPost("submit")]
-        public async Task<IActionResult> Submit([FromBody] CreateRequisitionCommand command)
+        public async Task<IActionResult> CreateRequisition([FromBody] CreateRequisitionCommand command)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var requisitionId = await _mediator.Send(command);
-            return Ok(requisitionId);
+            var requisition = await _mediator.Send(command);
+            return CreatedAtAction(nameof(CreateRequisition), new { id = requisition }, requisition);
         }
     }
 }

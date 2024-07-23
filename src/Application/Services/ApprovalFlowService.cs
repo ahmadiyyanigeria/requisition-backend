@@ -23,10 +23,19 @@ namespace Application.Services
             //read the approval flow config from settings
             var approvalSteps = new List<string>(_approvalFlowConfig.Value.Steps);
 
-            if (submitterRole == Roles.HOD)
+            /* if (submitterRole == Roles.HOD)
+             {
+                 // Remove the first approver if the submitter is HOD
+                 approvalSteps.RemoveAt(0);
+             }*/
+
+            // Find the index of the startAfterRole
+            int startIndex = approvalSteps.IndexOf(submitterRole);
+
+            // If the submitterRole is found, remove steps up to and including this role
+            if (startIndex >= 0)
             {
-                // Remove the first approver if the submitter is HOD
-                approvalSteps.RemoveAt(0);
+                approvalSteps.RemoveRange(0, startIndex + 1);
             }
 
             var approvalFlow = new ApprovalFlow(requisition.RequisitionId, approvers);
