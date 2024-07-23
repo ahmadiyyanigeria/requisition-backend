@@ -19,9 +19,9 @@ namespace Infrastructure.Persistence.Repositories
             return purchaseOrder;
         }
 
-        public Task<PurchaseOrder?> GetByIdAsync(Guid purchaseOrderId)
+        public async Task<PurchaseOrder?> GetByIdAsync(Guid purchaseOrderId)
         {
-            return _context.PurchaseOrders.FirstOrDefaultAsync(po => po.PurchaseOrderId  == purchaseOrderId);
+            return await _context.PurchaseOrders.FirstOrDefaultAsync(po => po.PurchaseOrderId  == purchaseOrderId);
         }
     }
 }

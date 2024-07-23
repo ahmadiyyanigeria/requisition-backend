@@ -1,4 +1,4 @@
-﻿using Domain.Entities.Common;
+﻿using Domain.Entities.ValueObjects;
 
 namespace Domain.Entities.Aggregates.PurchaseOrderAggregate
 {
@@ -10,10 +10,10 @@ namespace Domain.Entities.Aggregates.PurchaseOrderAggregate
         public string ContactPerson { get; private set; }
         public string ContactEmail { get; private set; }
         public string ContactPhone { get; private set; }
-        public BankAccount BankAccountDetails { get; private set; }
+        //public BankAccount BankAccountDetails { get; private set; }
 
         private Vendor() { }
-        public Vendor(string name, string address, string contactPerson, string contactEmail, string contactPhone, BankAccount bankAccountDetails)
+        public Vendor(string name, string address, string contactPerson, string contactEmail, string contactPhone)
         {
             VendorId = Guid.NewGuid();
             Name = name;
@@ -21,7 +21,7 @@ namespace Domain.Entities.Aggregates.PurchaseOrderAggregate
             ContactPerson = contactPerson;
             ContactEmail = contactEmail;
             ContactPhone = contactPhone;
-            BankAccountDetails = bankAccountDetails;
+            //BankAccountDetails = bankAccountDetails;
         }
     }
 }

@@ -29,11 +29,6 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
                 .HasColumnType("decimal(18, 2)")
                 .HasColumnName("grant_amount");
 
-            builder.Property(e => e.AccountNumber)
-                .IsRequired()
-                .HasColumnType("nvarchar(10)")
-                .HasColumnName("account_number");
-
             builder.Property(e => e.Status)
                 .IsRequired()
                 .HasMaxLength(20)

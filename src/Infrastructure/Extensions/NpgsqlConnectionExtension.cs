@@ -15,10 +15,10 @@ public static class NpgsqlConnectionExtension
             Username = configuration.GetValue<string>("DB_USERNAME"),
             IncludeErrorDetail = true,
             Pooling = true,
-            //IntegratedSecurity = true,
             MaxAutoPrepare = configuration.GetValue<int>("MAX_CONNECTION_POOL"),
             Timeout = configuration.GetValue<int>("MAX_TIMEOUT"),
             Port = configuration.GetValue<int?>("DB_PORT") ?? 5432
         };
+
     }
 }

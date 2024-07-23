@@ -1,4 +1,4 @@
-﻿using Domain.Entities.Common;
+﻿using Domain.Entities.ValueObjects;
 using Domain.Enums;
 
 namespace Domain.Entities.Aggregates.GrantAggregate
@@ -9,19 +9,19 @@ namespace Domain.Entities.Aggregates.GrantAggregate
         public Guid RequisitionId { get; private set; }
         public Guid SubmitterId { get; private set; }
         public decimal GrantAmount { get; private set; }
-        public string AccountNumber { get; private set; }
-        public BankAccount BankAccount { get; private set; }
+        //public string AccountNumber { get; private set; }
+       // public BankAccount BankAccount { get; private set; }
         public GrantStatus Status { get; private set; }
 
         private Grant() { }
 
-        public Grant(Guid requisitionId, Guid submitterId, decimal grantAmount, string bankAccount)
+        public Grant(Guid requisitionId, Guid submitterId, decimal grantAmount)
         {
             GrantId = Guid.NewGuid();
             RequisitionId = requisitionId;
             SubmitterId = submitterId;
             GrantAmount = grantAmount;
-            AccountNumber = bankAccount;
+            //AccountNumber = bankAccount;
             Status = GrantStatus.Requested;
         }
 

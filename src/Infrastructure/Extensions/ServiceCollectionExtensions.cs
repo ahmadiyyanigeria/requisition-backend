@@ -1,4 +1,7 @@
+using Application.Common.Interfaces;
 using Application.Repositories;
+using Application.Services;
+using Infrastructure.Authentication;
 using Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -14,12 +17,21 @@ public static class ServiceCollectionExtensions
         return serviceCollection
             .AddDbContext<ApplicationDbContext>(options =>
                 options.UseNpgsql(connectionString, action => action.MigrationsAssembly("Infrastructure")))
-            .AddScoped<IUnitOfWork, UnitOfWork>();
+            .AddScoped<IUnitOfWork, UnitOfWork>()
+            .AddScoped<IApprovalFlowRepository, ApprovalFlowRepository>()
+            .AddScoped<ICashAdvanceRepository, CashAdvanceRepository>()
+            .AddScoped<IGrantRepository, GrantRepository>()
+            .AddScoped<IPurchaseOrderRepository, PurchaseOrderRepository>()
+            .AddScoped<IRequisitionRepository, RequisitionRepository>()
+            .AddScoped<ISubmitterRepository, SubmitterRepository>();
     }
 
     public static IServiceCollection AddApplicationServices(this IServiceCollection serviceCollection)
     {
-        return serviceCollection;
+        return serviceCollection
+            .AddScoped<IApprovalFlowService, ApprovalFlowService>()
+            .AddScoped<IUserService, UserService>()
+            .AddScoped<ICurrentUser, CurrentUser>();
 
     }
 

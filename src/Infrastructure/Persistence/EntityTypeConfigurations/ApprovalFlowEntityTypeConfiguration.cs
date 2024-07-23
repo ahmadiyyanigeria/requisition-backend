@@ -14,31 +14,24 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
 
             builder.Property(e => e.ApprovalFlowId)
                 .HasColumnName("approval_flow_id")
-                .ValueGeneratedNever();
+                .ValueGeneratedNever()
+                .HasColumnType("uuid");
 
             builder.Property(e => e.RequisitionId)
                 .IsRequired()
-                .HasColumnName("requisition_id");
+                .HasColumnName("requisition_id")
+                .HasColumnType("uuid");
 
             builder.Property(e => e.CurrentStep)
                 .IsRequired()
-                .HasColumnName("current_step");
+                .HasColumnName("current_step")
+                .HasColumnType("integer");
 
-            builder.HasMany(e => e.Approvers)
+            // Configure the relationship between ApprovalFlow and ApprovalStep
+            builder.HasMany(e => e.ApproverSteps)
                 .WithOne()
-                .HasForeignKey("ApprovalFlowId")
-                .OnDelete(DeleteBehavior.Cascade);
-
-            builder.OwnsMany(e => e.Approvers, stepBuilder =>
-            {
-                stepBuilder.ToTable("approval_steps");
-                stepBuilder.HasKey(s => s.ApprovalStepId);
-                stepBuilder.Property(s => s.ApprovalStepId).HasColumnName("approval_step_id");
-                stepBuilder.Property(s => s.ApproverId).HasColumnName("approver_id");
-                stepBuilder.Property(s => s.Status).HasColumnName("status");
-                stepBuilder.Property(s => s.ApprovalDate).HasColumnName("approval_date");
-                stepBuilder.Property(s => s.Notes).HasColumnName("notes").HasColumnType("text");
-            });
+                .HasForeignKey(step => step.ApprovalFlowId) // Correct foreign key
+                .OnDelete(DeleteBehavior.Restrict); // Adjust as necessary
         }
     }
 }
