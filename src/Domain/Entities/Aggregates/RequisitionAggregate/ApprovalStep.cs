@@ -1,27 +1,26 @@
-﻿using Domain.Entities.Common;
-using Domain.Enums;
+﻿using Domain.Enums;
 
 namespace Domain.Entities.Aggregates.RequisitionAggregate
 {
     public class ApprovalStep
     {
-        public Guid ApprovalStepId { get; private set; }
-        public Guid ApproverId { get; private set; }
-        public ApprovalFlow ApprovalFlow { get; private set; }
-        public ApprovalStatus Status { get; private set; }
+        public Guid ApprovalStepId { get; private set; } = Guid.NewGuid();
+        public string ApproverId { get; private set; }
+        public Guid ApprovalFlowId { get; private set; }
+        public ApprovalStatus Status { get; private set; } = ApprovalStatus.Pending;
         public DateTime ApprovalDate { get; private set; }
-        public string Notes { get; private set; }
-        private readonly List<Role> _approvalRoles;
+        public string? Notes { get; private set; }
+        private readonly List<string> _approvalRoles;
 
-        public IReadOnlyList<Role> ApprovalRoles => _approvalRoles.AsReadOnly();
+        public IReadOnlyList<string> ApprovalRoles => _approvalRoles.AsReadOnly();
 
         private ApprovalStep() { }
-        public ApprovalStep(Guid approverId, List<Role> approverRoles)
+
+        public ApprovalStep(Guid approvalFlowId, string approverId, List<string> approverRoles)
         {
-            ApprovalStepId = Guid.NewGuid();
+            ApprovalFlowId = approvalFlowId;
             ApproverId = approverId;
-            _approvalRoles = approverRoles ?? new List<Role>();
-            Status = ApprovalStatus.Pending;
+            _approvalRoles = approverRoles ?? [];
         }
 
         public void Approve(string notes)

@@ -4,19 +4,20 @@
     {
         public Guid ApprovalFlowId { get; private set; } = Guid.NewGuid();
         public Guid RequisitionId { get; private set; }
-        public LinkedList<ApprovalStep> Approvers { get; private set; }
+        public LinkedList<ApprovalStep> ApproverSteps { get; private set; } = new ();
         public int CurrentStep { get; private set; } = 0;
 
         private ApprovalFlow() { }
-        public ApprovalFlow(Guid requisitionId, LinkedList<ApprovalStep> approvers)
+
+        public ApprovalFlow(Guid requisitionId, LinkedList<ApprovalStep> approverSteps)
         {
             RequisitionId = requisitionId;
-            Approvers = approvers;
+            ApproverSteps = approverSteps;
         }
 
         public void MoveToNextStep()
         {
-            if (CurrentStep < Approvers.Count - 1)
+            if (CurrentStep < ApproverSteps.Count - 1)
             {
                 CurrentStep++;
             }
@@ -24,7 +25,12 @@
 
         public ApprovalStep GetCurrentApprover()
         {
-            return Approvers.ElementAt(CurrentStep);
+            return ApproverSteps.ElementAt(CurrentStep);
+        }
+
+        public bool IsFinalStep()
+        {
+            return CurrentStep >= ApproverSteps.Count - 1;
         }
     }
 }

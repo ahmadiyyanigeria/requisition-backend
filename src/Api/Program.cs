@@ -1,5 +1,8 @@
 using Api.Extensions;
+using Application.Commands;
+using Application.Configurations;
 using Infrastructure.Extensions;
+using Microsoft.Extensions.Configuration;
 using Prometheus;
 using Serilog;
 
@@ -15,6 +18,7 @@ builder.Services.AddControllers();
 builder.Services.AddApplicationServices();
 builder.Services.AddDatabase(configuration);
 
+builder.Services.Configure<ApprovalFlowConfiguration>(builder.Configuration.GetSection("ApprovalFlows"));
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -25,6 +29,7 @@ builder.Services.ConfigureApiVersioning();
 builder.Services.ConfigureMvc();
 builder.Services.AddHealthChecks();
 builder.Services.AddMapster();
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(typeof(CreateRequisition).Assembly));
 builder.Services.AddValidators();
 
 var app = builder.Build();
@@ -43,7 +48,7 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapHealthChecks("/healthz");
 
-//MigrationExtensions.ApplyMigration(app.Services, !builder.Environment.IsProduction());
+MigrationExtensions.ApplyMigration(app.Services, !builder.Environment.IsProduction());
 
 app.Run();
 

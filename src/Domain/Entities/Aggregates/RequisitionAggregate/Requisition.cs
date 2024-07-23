@@ -1,24 +1,28 @@
-﻿using Domain.Entities.Common;
+﻿using Domain.Entities.Aggregates.SubmitterAggregate;
+using Domain.Entities.Common;
+using Domain.Entities.ValueObjects;
 using Domain.Enums;
+using Domain.Exceptions;
 
 namespace Domain.Entities.Aggregates.RequisitionAggregate
 {
     public class Requisition
     {
         public Guid RequisitionId { get; private set; } = Guid.NewGuid();
-        public Guid SubmitterId { get; private set; }
-        public string Description { get; private set; }
-        public RequisitionStatus Status { get; private set; } = RequisitionStatus.Pending;
+        public Guid SubmitterId { get; private set; } = default!; 
+        public string Description { get; private set; } = default!;
+        public string ExpenseHead { get; private set; } = default!;
+        public RequisitionStatus Status { get; private set; } = RequisitionStatus.Draft;
         public DateTime RequestedDate { get; private set; } = DateTime.UtcNow;
         public DateTime? ApprovedDate { get; private set; }
         public DateTime? RejectedDate { get; private set; }
         public decimal TotalAmount { get; private set; }
-        public ApprovalFlow ApprovalFlow { get; private set; }
-        public Guid ExpenseAccountId { get; private set; }
+        public ApprovalFlow ApprovalFlow { get; private set; } = default!;
+        public Guid? ExpenseAccountId { get; private set; }
         public RequisitionType RequisitionType { get; private set; }
-        public string AccountNumber { get; private set; }
-        public BankAccount BankAccount { get; private set; }
-        public string Department { get; private set; }//seek clarification
+        public BankAccount? BankAccount { get; private set; }
+        public string Department { get; private set; } = default!;
+        public Submitter Submitter { get; private set; } = default!;
 
         private readonly List<RequisitionItem> _items = [];
         private readonly List<Attachment> _attachments = [];
@@ -26,46 +30,34 @@ namespace Domain.Entities.Aggregates.RequisitionAggregate
         public IReadOnlyList<Attachment> Attachments => _attachments.AsReadOnly();
         public IReadOnlyList<RequisitionItem> Items => _items.AsReadOnly();
 
-        public Requisition(Guid submitterId, string description, Guid expenseAccountId, RequisitionType requisitionType, string accountNumber, string department)
+        private Requisition() { }
+
+        public Requisition(Guid submitterId, string description, string expenseHead, RequisitionType requisitionType, BankAccount? bankAccount, string department)
         {
             SubmitterId = submitterId;
             Description = description;
-            ExpenseAccountId = expenseAccountId;
+            ExpenseHead = expenseHead;
             RequisitionType = requisitionType;
-            AccountNumber = accountNumber;
-            Department = department ?? "Default Department"; // Assuming you have a method to get the default department of the submitter
-        }
-
-        public void Approve(Guid approverId, string notes)
-        {
-            if (Status == RequisitionStatus.Pending)
-            {
-                Status = RequisitionStatus.Approved;
-                ApprovedDate = DateTime.UtcNow;
-                // Additional logic for approval
-            }
-            // Consider throwing an exception or handling other cases
-        }
-
-        public void Reject(Guid approverId, string notes)
-        {
-            if (Status == RequisitionStatus.Pending)
-            {
-                Status = RequisitionStatus.Rejected;
-                RejectedDate = DateTime.UtcNow;
-                // Additional logic for rejection
-            }
-            // Consider throwing an exception or handling other cases
+            BankAccount = bankAccount;
+            Department = department ?? "Default Department";           
         }
 
         public void AddItem(RequisitionItem item)
         {
+            if (item == null)
+            {
+                throw new DomainException("Requisition item cannot be null", ExceptionCodes.NullRequisitionItem.ToString(), 400);
+            }
             _items.Add(item);
             CalculateTotalAmount();
         }
 
         public void RemoveItem(RequisitionItem item)
         {
+            if (item == null)
+            {
+                throw new DomainException("Requisition item cannot be null", ExceptionCodes.NullRequisitionItem.ToString(), 400);
+            }
             _items.Remove(item);
             CalculateTotalAmount();
         }
@@ -73,6 +65,72 @@ namespace Domain.Entities.Aggregates.RequisitionAggregate
         private void CalculateTotalAmount()
         {
             TotalAmount = _items.Sum(item => item.TotalPrice);
+        }
+
+        public void SetApprovalFlow(ApprovalFlow approvalFlow)
+        {
+            ApprovalFlow = approvalFlow ?? throw new DomainException($"Approval flow not configured", ExceptionCodes.NullApprovalFlow.ToString(), 500);
+        }
+
+        public void SetStatus(RequisitionStatus status)
+        {
+            Status = status;
+        }
+
+        public void SetRequisitionPending()
+        {
+            Status = RequisitionStatus.Pending;
+        }
+
+        public void ApproveCurrentStep(string approverId, string notes)
+        {
+            if (Status == RequisitionStatus.Pending || Status == RequisitionStatus.InProgress)
+            {
+                var currentApprover = ApprovalFlow.GetCurrentApprover();
+                if (currentApprover.ApproverId == approverId)
+                {
+                    currentApprover.Approve(notes);
+                    if (ApprovalFlow.IsFinalStep())
+                    {
+                        Status = RequisitionStatus.Approved;
+                        ApprovedDate = DateTime.UtcNow;
+                    }
+                    else
+                    {
+                        ApprovalFlow.MoveToNextStep();
+                    }
+                }
+                else
+                {
+                    throw new DomainException($"You are not authorized to approve this step.", ExceptionCodes.Unauthorized.ToString(), 403);
+                }
+            }
+            else
+            {
+                throw new DomainException($"Requisition is not in pending state.", ExceptionCodes.InvalidApprovalState.ToString(), 400);
+            }
+        }
+
+        public void RejectCurrentStep(string approverId, string notes)
+        {
+            if (Status == RequisitionStatus.Pending)
+            {
+                var currentApprover = ApprovalFlow.GetCurrentApprover();
+                if (currentApprover.ApproverId == approverId)
+                {
+                    currentApprover.Reject(notes);
+                    Status = RequisitionStatus.Rejected;
+                    RejectedDate = DateTime.UtcNow;
+                }
+                else
+                {
+                    throw new DomainException($"You are not authorized to approve this step.", ExceptionCodes.Unauthorized.ToString(), 403);
+                }
+            }
+            else
+            {
+                throw new DomainException($"Requisition is not in pending state.", ExceptionCodes.InvalidApprovalState.ToString(), 400);
+            }
         }
 
         public void AddAttachment(Attachment attachment)
@@ -98,7 +156,7 @@ namespace Domain.Entities.Aggregates.RequisitionAggregate
 
             ValidateApproval();
 
-            // Example: Generate order,notify stakeholders, etc.
+            // Example: Generate order, notify stakeholders, etc.
 
             Status = RequisitionStatus.Processed;
             // Set additional properties or perform other actions as needed

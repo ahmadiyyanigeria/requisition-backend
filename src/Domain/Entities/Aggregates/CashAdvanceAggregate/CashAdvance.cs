@@ -1,4 +1,4 @@
-﻿using Domain.Entities.Common;
+﻿using Domain.Entities.ValueObjects;
 using Domain.Enums;
 using System;
 
@@ -10,21 +10,20 @@ namespace Domain.Entities.Aggregates.CashAdvanceAggregate
         public Guid RequisitionId { get; private set; }
         public Guid SubmitterId { get; private set; }
         public decimal AdvanceAmount { get; private set; }
-        public string AccountNumber { get; private set; }
-        public BankAccount BankAccount { get; private set; }
+       // public BankAccount BankAccount { get; private set; }
         public CashAdvanceStatus Status { get; private set; }
         public RetirementEntry RetirementEntry { get; private set; }
         public RefundEntry RefundEntry { get; private set; }
         public ReimbursementEntry ReimbursementEntry { get; private set; }
 
         private CashAdvance() { }
-        public CashAdvance(Guid requisitionId, Guid submitterId, decimal advanceAmount, string accountNumber)
+        public CashAdvance(Guid requisitionId, Guid submitterId, decimal advanceAmount)
         {
             CashAdvanceId = Guid.NewGuid();
             RequisitionId = requisitionId;
             SubmitterId = submitterId;
             AdvanceAmount = advanceAmount;
-            AccountNumber = accountNumber;
+           // BankAccount = bankAccount;
             Status = CashAdvanceStatus.Requested;
         }
 

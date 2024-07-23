@@ -19,9 +19,9 @@ namespace Infrastructure.Persistence.Repositories
             return grant;
         }
 
-        public Task<Grant?> GetByIdAsync(Guid grantId)
+        public async Task<Grant?> GetByIdAsync(Guid grantId)
         {
-            return _context.Grants.FirstOrDefaultAsync(g => g.GrantId == grantId);
+            return await _context.Grants.FirstOrDefaultAsync(g => g.GrantId == grantId);
         }
     }
 }
