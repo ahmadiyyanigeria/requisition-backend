@@ -2,8 +2,8 @@
 {
     public class Roles
     {
-        public const string HOD = "hod";
-        public const string FinSec = "finsec";
-        public const string CEO = "ceo";
+        public const string HOD = "HOD";
+        public const string Accountant = "Accountant";
+        public const string CEO = "CEO";
     }
 }

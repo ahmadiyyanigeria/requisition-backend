@@ -3,7 +3,9 @@ using Application.Helpers;
 using Application.Repositories;
 using Application.Services;
 using Domain.Entities.Aggregates.RequisitionAggregate;
+using Domain.Entities.Aggregates.SubmitterAggregate;
 using Domain.Entities.Common;
+using Domain.Entities.ValueObjects;
 using Domain.Enums;
 using FluentValidation;
 using MediatR;
@@ -16,12 +18,11 @@ namespace Application.Commands
         public class CreateRequisitionCommand : IRequest<Guid>
         {
             public string Description { get; init; } = default!; 
-            public Guid ExpenseAccountId { get; }
-            public RequisitionType RequisitionType { get; }
-            public string AccountNumber { get; init; } = default!;
-            public string Department { get; init; } = default!;
-            public List<RequisitionItemDto> Items { get; set; }
-            public List<AttachmentDto> Attachments { get; set; }
+            public string ExpenseHead { get; init; } = default!; 
+            public RequisitionType RequisitionType { get; init; }
+            public BankAccount? BankAccount { get; init; }
+            public IReadOnlyList<RequisitionItemDto> Items { get; set; } = null!;
+            public IReadOnlyList<AttachmentDto>? Attachments { get; set; }
             public bool IsDraft { get; set; }  // Indicates if the submission is a draft
         }
 
@@ -57,20 +58,25 @@ namespace Application.Commands
 
             public async Task<Guid> Handle(CreateRequisitionCommand request, CancellationToken cancellationToken)
             {
-                //get current logged in user
-                var currentUserEmail = _user.GetUserEmail();
+                //get current logged in user //userId, userrole, name, department, email, phonenumber
+                //assumptions
+                string userId = "1";
+                string name = "test";
+                string email = "";
+                string department = "HR";
+                string role = "employee";
 
-                //use the current logged in user email to get the submitter details
-                var submitter = await _submitterRepository.GetByEmailAsync(currentUserEmail!);
-                var submitterRole = submitter!.Position;
+                //create submitter record
+                var submitter = new Submitter(userId, name, email, role, department);
 
+                //creating the requisition object
                 var requisition = new Requisition(
                     submitter.SubmitterId,
                     request.Description,
-                    request.ExpenseAccountId,
+                    request.ExpenseHead,
                     request.RequisitionType,
-                    request.AccountNumber,
-                    request.Department);
+                    request.BankAccount,
+                    department);
 
                 foreach (var item in request.Items)
                 {
@@ -78,22 +84,27 @@ namespace Application.Commands
                     requisition.AddItem(requisitionItem);
                 }
 
-                foreach (var attachment in request.Attachments)
+                if(request.Attachments != null)
                 {
-                    var attachmentEntity = new Attachment(attachment.FileName, attachment.FileType, attachment.FileUrl);
-                    requisition.AddAttachment(attachmentEntity);
+                    foreach (var attachment in request.Attachments)
+                    {
+                        var attachmentEntity = new Attachment(attachment.FileName, attachment.FileType, attachment.FileUrl);
+                        requisition.AddAttachment(attachmentEntity);
+                    }
                 }
 
                 if (!request.IsDraft)
                 {
-                    requisition.SetStatus(RequisitionStatus.Pending);
+                    requisition.SetRequisitionPending();
                 }
 
                 //create approval flow for the requisition
-                var approvalFlow = _approvalFlowService.CreateApprovalFlow(requisition, submitterRole);
+                var approvalFlow = _approvalFlowService.CreateApprovalFlow(requisition, role);
+
                 //set the flow for the requisition
                 requisition.SetApprovalFlow(approvalFlow);
 
+                await _submitterRepository.AddAsync(submitter);
                 await _requisitionRepository.AddAsync(requisition);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -111,19 +122,13 @@ namespace Application.Commands
                 .MaximumLength(500).WithMessage("Description cannot exceed 500 characters.")
                 .Must(ScriptContentValidator.NotContainScript).WithMessage("Description contains invalid characters.");
 
-            RuleFor(x => x.ExpenseAccountId)
-                .NotEmpty().WithMessage("Expense Account ID is required.");
+            RuleFor(x => x.ExpenseHead)
+                .NotEmpty().WithMessage("ExpenseHead is required.")
+                .MaximumLength(50).WithMessage("ExpenseHead cannot exceed 500 characters.")
+                .Must(ScriptContentValidator.NotContainScript).WithMessage("ExpenseHead contains invalid characters.");
 
             RuleFor(x => x.RequisitionType)
                 .IsInEnum().WithMessage("Invalid requisition type.");
-
-            RuleFor(x => x.AccountNumber)
-                .NotEmpty().WithMessage("Account Number is required.")
-                .Matches(@"^\d+$").WithMessage("Account Number must be numeric.");
-
-            RuleFor(x => x.Department)
-                .NotEmpty().WithMessage("Department is required.")
-                .Must(ScriptContentValidator.NotContainScript).WithMessage("Department contains invalid characters.");
 
             RuleFor(x => x.Items)
                 .NotEmpty().WithMessage("Requisition must contain at least one item.")

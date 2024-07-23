@@ -1,7 +1,6 @@
 ﻿using Application.Configurations;
 using Domain.Constants;
 using Domain.Entities.Aggregates.RequisitionAggregate;
-using Domain.Entities.Common;
 using Microsoft.Extensions.Options;
 
 namespace Application.Services
@@ -30,16 +29,18 @@ namespace Application.Services
                 approvalSteps.RemoveAt(0);
             }
 
+            var approvalFlow = new ApprovalFlow(requisition.RequisitionId, approvers);
+
             foreach (var role in approvalSteps)
             {
-                var approverRole = role;
-                approvers.AddLast(new ApprovalStep(GetRoleUserId(approverRole), [approverRole]));
+                var approverId = GetRoleUserId(role); // Method to get user ID for the role
+                approvers.AddLast(new ApprovalStep(approvalFlow.ApprovalFlowId, approverId, [role]));
             }
 
-            return new ApprovalFlow(requisition.RequisitionId, approvers);
+            return approvalFlow;
         }
 
-        private Guid GetRoleUserId(string role)
+        private string GetRoleUserId(string role)
         {
             var user = _userService.GetUserByRole(role);
             if (user == null)

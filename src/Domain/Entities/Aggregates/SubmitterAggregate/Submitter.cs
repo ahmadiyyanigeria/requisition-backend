@@ -1,26 +1,25 @@
 ﻿using Domain.Entities.Aggregates.RequisitionAggregate;
-using Domain.Entities.Common;
+using Domain.Entities.ValueObjects;
 
 namespace Domain.Entities.Aggregates.SubmitterAggregate
 {
     public class Submitter
     {
         public Guid SubmitterId { get; private set; } = Guid.NewGuid();
-        public string Name { get; private set; }
-        public string Email { get; private set; }
-        public string Position { get; private set; }
-        public string Department { get; private set; }
-        public BankAccount BankAccount { get; private set; }
-        public IReadOnlyList<Requisition> Requisitions { get; private set; } = [];
+        public string Name { get; private set; } = default!;
+        public string UserId { get; private set; } = default!;
+        public string? Email { get; private set; }
+        public string Position { get; private set; } = default!;
+        public string Department { get; private set; } = default!;
 
         private Submitter() { }
-        public Submitter(string name, string email, string position, string department, BankAccount bankAccount)
+        public Submitter(string userId, string name, string? email, string position, string department)
         {
+            UserId = userId;
             Name = name;
             Email = email;
             Position = position;
             Department = department;
-            BankAccount = bankAccount;
         }
     }
 }

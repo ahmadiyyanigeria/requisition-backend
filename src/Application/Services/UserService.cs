@@ -13,9 +13,9 @@ namespace Application.Services
             // Populate with sample users
             _users = new List<User>
             {
-                new User { UserId = Guid.NewGuid(), Role = Roles.HOD, Department = "Welfare" },
-                new User { UserId = Guid.NewGuid(), Role = Roles.FinSec, Department = "Account" },
-                new User { UserId = Guid.NewGuid(), Role = Roles.CEO, Department = "Tabligh" },
+                new User { UserId = "1", Role = Roles.HOD, Department = "Welfare" },
+                new User { UserId = "2", Role = Roles.Accountant, Department = "Account" },
+                new User { UserId = "3", Role = Roles.CEO, Department = "Tabligh" },
             };
         }
 
@@ -24,7 +24,7 @@ namespace Application.Services
             return _users.FirstOrDefault(u => u.Role == role);
         }
 
-        public string GetUserRole(Guid userId)
+        public string GetUserRole(string userId)
         {
             var user = _users.FirstOrDefault(u => u.UserId == userId);
             if (user == null)

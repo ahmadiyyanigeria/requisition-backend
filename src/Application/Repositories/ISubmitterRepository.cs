@@ -6,5 +6,6 @@ namespace Application.Repositories
     {
         Task<Submitter?> GetByIdAsync(Guid submitterId);
         Task<Submitter?> GetByEmailAsync(string email);
+        Task<Submitter> AddAsync(Submitter submitter);
     }
 }

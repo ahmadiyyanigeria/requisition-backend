@@ -14,19 +14,23 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
 
             builder.Property(e => e.RequisitionItemId)
                 .HasColumnName("requisition_item_id")
-                .ValueGeneratedNever();
+                .ValueGeneratedNever()
+                .HasColumnType("uuid"); 
 
             builder.Property(e => e.RequisitionId)
                 .IsRequired()
-                .HasColumnName("requisition_id");
+                .HasColumnName("requisition_id")
+                .HasColumnType("uuid"); 
 
             builder.Property(e => e.Description)
                 .IsRequired()
-                .HasColumnName("description");
+                .HasColumnName("description")
+                .HasColumnType("text"); 
 
             builder.Property(e => e.Quantity)
                 .IsRequired()
-                .HasColumnName("quantity");
+                .HasColumnName("quantity")
+                .HasColumnType("integer");
 
             builder.Property(e => e.UnitPrice)
                 .HasColumnType("decimal(18,2)")

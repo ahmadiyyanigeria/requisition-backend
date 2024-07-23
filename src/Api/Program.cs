@@ -1,4 +1,5 @@
 using Api.Extensions;
+using Application.Commands;
 using Application.Configurations;
 using Infrastructure.Extensions;
 using Microsoft.Extensions.Configuration;
@@ -28,6 +29,7 @@ builder.Services.ConfigureApiVersioning();
 builder.Services.ConfigureMvc();
 builder.Services.AddHealthChecks();
 builder.Services.AddMapster();
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(typeof(CreateRequisition).Assembly));
 builder.Services.AddValidators();
 
 var app = builder.Build();
@@ -46,7 +48,7 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapHealthChecks("/healthz");
 
-//MigrationExtensions.ApplyMigration(app.Services, !builder.Environment.IsProduction());
+MigrationExtensions.ApplyMigration(app.Services, !builder.Environment.IsProduction());
 
 app.Run();
 

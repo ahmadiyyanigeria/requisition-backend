@@ -5,6 +5,6 @@ namespace Application.Services
     public interface IUserService
     {
         User GetUserByRole(string role);
-        string GetUserRole(Guid userId);
+        string GetUserRole(string userId);
     }
 }
