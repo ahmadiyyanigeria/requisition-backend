@@ -4,7 +4,7 @@
     {
         public Guid ApprovalFlowId { get; private set; } = Guid.NewGuid();
         public Guid RequisitionId { get; private set; }
-        public LinkedList<ApprovalStep> ApproverSteps { get; private set; } = new ();
+        public LinkedList<ApprovalStep> ApproverSteps { get; private set; } = null!;
         public int CurrentStep { get; private set; } = 0;
 
         private ApprovalFlow() { }
