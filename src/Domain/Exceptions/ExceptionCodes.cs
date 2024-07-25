@@ -7,8 +7,7 @@ public enum ExceptionCodes
     InvalidProcessingState,
     NullApprovalFlow,
     NullRequisitionItem,
-    ExpenseHeadAlreadyExist
-    NullRequisitionItem,
+    ExpenseHeadAlreadyExist,
     RequisitionNotFound,
     RejectNotesNull
 }
