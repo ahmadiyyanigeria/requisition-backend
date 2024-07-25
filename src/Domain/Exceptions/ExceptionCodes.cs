@@ -5,5 +5,6 @@ public enum ExceptionCodes
     Unauthorized,
     InvalidApprovalState,
     NullApprovalFlow,
-    NullRequisitionItem
+    NullRequisitionItem,
+    ExpenseHeadAlreadyExist
 }
