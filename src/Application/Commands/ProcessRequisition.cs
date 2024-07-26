@@ -1,4 +1,6 @@
-﻿using Application.Repositories;
+﻿using Application.Common.Interfaces;
+using Application.Repositories;
+using Domain.Entities.Common;
 using Domain.Exceptions;
 using MediatR;
 
@@ -23,17 +25,20 @@ namespace Application.Commands
         {
             private readonly IRequisitionRepository _requisitionRepository;
             private readonly IUnitOfWork _unitOfWork;
+            private readonly ICurrentUser _user;
 
-            public Handler(IRequisitionRepository requisitionRepository, IUnitOfWork unitOfWork)
+            public Handler(IRequisitionRepository requisitionRepository, IUnitOfWork unitOfWork, ICurrentUser user)
             {
                 _requisitionRepository = requisitionRepository;
                 _unitOfWork = unitOfWork;
+                _user = user;
             }
 
             public async Task<Guid> Handle(ProcessRequisitionCommand request, CancellationToken cancellationToken)
             {
-                //get approvalId
-                string approverId = "1";
+                var user = _user.GetUserDetails();
+                string approverId = user.UserId;
+
                 var requisition = await _requisitionRepository.GetByIdAsync(request.RequisitionId) ?? throw new DomainException("Requisition not found", ExceptionCodes.RequisitionNotFound.ToString(), 400);
 
                 // Process the action
