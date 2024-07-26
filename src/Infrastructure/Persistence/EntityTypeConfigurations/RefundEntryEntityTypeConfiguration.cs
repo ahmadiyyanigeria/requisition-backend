@@ -33,12 +33,6 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
             builder.Property(e => e.Date)
                 .IsRequired() 
                 .HasColumnName("date"); 
-
-            builder.Property(e => e.AccountNumber)
-                .IsRequired() 
-                .HasColumnName("account_number") 
-                .HasMaxLength(20);
-
         }
     }
 }

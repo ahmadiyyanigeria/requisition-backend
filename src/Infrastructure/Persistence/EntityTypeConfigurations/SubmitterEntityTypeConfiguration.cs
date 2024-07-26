@@ -28,17 +28,6 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
             builder.Property(s => s.Department)
                 .IsRequired()
                 .HasMaxLength(100);
-
-            builder.OwnsOne(s => s.BankAccount, bankAccount =>
-            {
-                bankAccount.Property(b => b.AccountNumber).HasMaxLength(20).IsRequired();
-                bankAccount.Property(b => b.BankName).HasMaxLength(100).IsRequired();
-                bankAccount.Property(b => b.AccountName).HasMaxLength(100).IsRequired();
-            });
-
-            builder.HasMany(s => s.Requisitions)
-                .WithOne()
-                .HasForeignKey(r => r.SubmitterId);
         }
     }
 }

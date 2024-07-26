@@ -44,25 +44,6 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
                 .WithMany()
                 .HasForeignKey(po => po.VendorId)
                 .HasConstraintName("fk_vendor_id");
-
-            builder.HasMany(po => po.Items)
-                .WithOne()
-                .HasForeignKey(i => i.PurchaseOrderId)
-                .HasConstraintName("fk_purchase_order_id")
-                .OnDelete(DeleteBehavior.Restrict);
-
-            builder.HasMany(po => po.Payments)
-                .WithOne()
-                .HasForeignKey(p => p.PurchaseOrderId)
-                .HasConstraintName("fk_purchase_order_id")
-                .OnDelete(DeleteBehavior.Restrict);
-
-            builder.OwnsOne(po => po.Invoice, a =>
-            {
-                a.Property(i => i.FileName).HasColumnName("invoice_file_name");
-                a.Property(i => i.FileType).HasColumnName("invoice_file_type");
-                a.Property(i => i.FileContent).HasColumnName("invoice_file_content");
-            });
         }
     }
 }

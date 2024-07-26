@@ -118,33 +118,6 @@ public static class ServiceCollectionExtensions
                 RoleClaimType = ClaimTypes.Role,
                 IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.Default.GetBytes("S0M3RAN0MS3CR3T!1!MAG1C!1!343456y674688847"))
             };
-            options.Events = new JwtBearerEvents
-            {
-                OnChallenge = context =>
-                {
-                    context.HandleResponse();
-                    if (!context.Response.HasStarted)
-                    {
-                        throw new Exception("Authentication Failed.");
-                    }
-
-                    return Task.CompletedTask;
-                },
-                OnForbidden = _ => throw new UnauthorizedAccessException("You are not authorized to access this resource."),
-                OnMessageReceived = context =>
-                {
-                    var accessToken = context.Request.Query["access_token"];
-
-                    if (!string.IsNullOrEmpty(accessToken) &&
-                        context.HttpContext.Request.Path.StartsWithSegments("/notifications"))
-                    {
-                        // Read the token out of the query string
-                        context.Token = accessToken;
-                    }
-
-                    return Task.CompletedTask;
-                }
-            };
         });
     }
 

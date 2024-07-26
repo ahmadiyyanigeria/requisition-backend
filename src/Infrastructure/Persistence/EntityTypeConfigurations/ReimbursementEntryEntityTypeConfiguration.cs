@@ -1,4 +1,4 @@
-﻿using Domain.Entities.Aggregates.CashAdvanceAggregate;
+﻿/*using Domain.Entities.Aggregates.CashAdvanceAggregate;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -47,3 +47,4 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
         }
     }
 }
+*/

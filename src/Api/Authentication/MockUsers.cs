@@ -6,6 +6,13 @@ namespace Api.Authentication
     {
         public static List<User> Users = new()
         {
+             new User
+            {
+                UserId = "4",
+                Name = "Cynthia Paul",
+                Email = "employee@example.com",
+                Role = "Employee"
+            },
             new User
             {
                 UserId = "1",

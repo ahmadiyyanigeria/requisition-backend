@@ -34,20 +34,10 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
                 .HasColumnName("advance_amount")
                 .HasColumnType("decimal(18,2)");
 
-            builder.Property(e => e.AccountNumber)
-                .IsRequired()
-                .HasColumnName("account_number")
-                .HasMaxLength(20);
-
             builder.Property(e => e.Status)
                 .IsRequired()
                 .HasColumnName("status")
                 .HasConversion<int>();
-
-            builder.HasOne(e => e.BankAccount)
-                .WithMany()
-                .HasForeignKey("bank_account_id")
-                .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(e => e.RetirementEntry)
                 .WithMany()
