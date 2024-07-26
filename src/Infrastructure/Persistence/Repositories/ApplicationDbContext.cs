@@ -28,8 +28,11 @@ public class ApplicationDbContext : DbContext
 
     // DbSet for Grant aggregate
     public DbSet<Grant> Grants { get; set; }
+    
+    //DbSet for expense head
+    public DbSet<ExpenseHead> ExpenseHeads { get; set; }
 
-    // DbSet for Requisition 
+    // DbSet for Requisition S
     public DbSet<Requisition> Requisitions { get; set; }
     public DbSet<RequisitionItem> RequisitionItems { get; set; }
     public DbSet<Attachment> Attachments { get; set; }

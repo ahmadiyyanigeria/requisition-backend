@@ -25,7 +25,8 @@ public static class ServiceCollectionExtensions
             .AddScoped<IGrantRepository, GrantRepository>()
             .AddScoped<IPurchaseOrderRepository, PurchaseOrderRepository>()
             .AddScoped<IRequisitionRepository, RequisitionRepository>()
-            .AddScoped<ISubmitterRepository, SubmitterRepository>();
+            .AddScoped<ISubmitterRepository, SubmitterRepository>()
+            .AddScoped<IExpenseHeadRepository, ExpenseHeadRepository>();
     }
 
     public static IServiceCollection AddApplicationServices(this IServiceCollection serviceCollection)
