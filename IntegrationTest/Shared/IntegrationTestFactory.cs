@@ -21,7 +21,6 @@ public class IntegrationTestFactory : WebApplicationFactory<Program>, IAsyncLife
     private DbConnection _dbConnection = default!;
     private Respawner _respawner = default!;
     public HttpClient RequisitionAdminClient { get; private set; } = default!;
-    public HttpClient IpAdminClient { get; private set; } = default!;
     public HttpClient RequisitionProgramAdminClient { get; private set; } = default!;
     public HttpClient AnonymousClient { get; private set; } = default!;
 
@@ -106,7 +105,6 @@ public class IntegrationTestFactory : WebApplicationFactory<Program>, IAsyncLife
     private void InitiateClients()
     {
         RequisitionAdminClient = CreateClient();
-        IpAdminClient = CreateClient();
         RequisitionProgramAdminClient = CreateClient();
         AnonymousClient = CreateClient();
     }

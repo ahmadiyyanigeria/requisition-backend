@@ -33,7 +33,6 @@ public abstract class IntegrationTestBase : VerifyBase, IAsyncLifetime
     private void InitiateClients()
     {
         RequisitionAdminClient = _applicationFactory.RequisitionAdminClient;
-        IpAdminClient = _applicationFactory.IpAdminClient;
         RequisitionProgramAdminClient = _applicationFactory.RequisitionProgramAdminClient;
         AnonymousClient = _applicationFactory.AnonymousClient;
     }
@@ -41,8 +40,6 @@ public abstract class IntegrationTestBase : VerifyBase, IAsyncLifetime
     {
         var adminToken = new MockJwtToken().AddClaims(Guid.NewGuid(), "requisition-admin").Generate();
         RequisitionAdminClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", adminToken);
-        var ipAdminToken = new MockJwtToken().AddClaims(Guid.NewGuid(), "ip-admin").Generate();
-        IpAdminClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ipAdminToken);
         var programAdminToken = new MockJwtToken().AddClaims(Guid.NewGuid(), "requisition-program-admin").Generate();
         RequisitionProgramAdminClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", programAdminToken);
 
