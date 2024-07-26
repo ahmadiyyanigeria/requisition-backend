@@ -6,11 +6,16 @@ using Mapster;
 using MapsterMapper;
 using MediatR;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Reflection.Metadata;
+using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Xml.Linq;
 
 namespace Api.Extensions;
 
@@ -69,15 +74,73 @@ public static class ServiceCollectionExtensions
                     {
                         Reference = new()
                         {
-                            Id = "OAuth2",
-                            Type = ReferenceType.SecurityScheme
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
                         },
                     },
                     new List<string>()
                 }
            });
+
+            // Configure Swagger to use JWT Bearer token authentication
+            c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
+            {
+                Description = "Input your Bearer token to access this API",
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.Http,
+                Scheme = JwtBearerDefaults.AuthenticationScheme,
+                BearerFormat = "JWT"
+            });
         });
         services.AddFluentValidationRulesToSwagger();
+    }
+
+    public static void AddMockAuth(this IServiceCollection services)
+    {
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            options.RequireHttpsMetadata = false;
+            options.SaveToken = true;
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = "https://your-keycloak-domain/auth/realms/your-realm",
+                ValidAudience = "your-client-id",
+                RoleClaimType = ClaimTypes.Role,
+                IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.Default.GetBytes("S0M3RAN0MS3CR3T!1!MAG1C!1!343456y674688847"))
+            };
+        });
+    }
+
+    public static void AddAuth(this IServiceCollection services)
+    {
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.Authority = "https://your-keycloak-domain/auth/realms/your-realm";
+                options.Audience = "your-client-id";
+                options.RequireHttpsMetadata = false;
+
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidIssuer = "https://your-keycloak-domain/auth/realms/your-realm",
+                    ValidateAudience = true,
+                    ValidAudience = "your-client-id",
+                    ValidateLifetime = true,
+                    RoleClaimType = ClaimTypes.Role,
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
     }
 
     public static IServiceCollection AddMapster(this IServiceCollection services)

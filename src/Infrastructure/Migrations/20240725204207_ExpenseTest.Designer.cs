@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240725204207_ExpenseTest")]
+    partial class ExpenseTest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -534,23 +537,6 @@ namespace Infrastructure.Migrations
                     b.HasIndex("RequisitionId");
 
                     b.ToTable("attachments", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Entities.Common.ExpenseHead", b =>
-                {
-                    b.Property<string>("Name")
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("name")
-                        .UseCollation("case_insensitive");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("description")
-                        .UseCollation("case_insensitive");
-
-                    b.HasKey("Name");
-
-                    b.ToTable("expense_head", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Common.Role", b =>

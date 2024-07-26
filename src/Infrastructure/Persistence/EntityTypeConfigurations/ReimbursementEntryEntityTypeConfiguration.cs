@@ -14,7 +14,7 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
 
             builder.Property(e => e.ReimbursementEntryId)
                 .HasColumnName("reimbursement_entry_id")
-                .ValueGeneratedNever(); // Assuming you generate this outside of EF Core
+                .ValueGeneratedNever(); 
 
             builder.Property(e => e.CashAdvanceId)
                 .IsRequired()
@@ -37,7 +37,6 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
                 .IsRequired()
                 .HasColumnName("attachment_id");
 
-            // Assuming Attachment is a complex type or owned entity
             builder.OwnsOne(e => e.Receipt, attachment =>
             {
                 attachment.Property<Guid>("AttachmentId").HasColumnName("attachment_id");

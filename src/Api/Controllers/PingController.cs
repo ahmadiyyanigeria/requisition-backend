@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
@@ -7,6 +8,7 @@ namespace Api.Controllers;
 public class PingController : ControllerBase
 {
     [HttpGet]
+    [Authorize]
     public IActionResult Ping()
     {
         var response = "pong";

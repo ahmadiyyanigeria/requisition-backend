@@ -16,6 +16,7 @@ namespace Domain.Entities.Aggregates.RequisitionAggregate
         public DateTime RequestedDate { get; private set; } = DateTime.UtcNow;
         public DateTime? ApprovedDate { get; private set; }
         public DateTime? RejectedDate { get; private set; }
+        public DateTime? LastDateModified { get; private set; }
         public decimal TotalAmount { get; private set; }
         public ApprovalFlow ApprovalFlow { get; private set; } = default!;
         public Guid? ExpenseAccountId { get; private set; }
@@ -72,17 +73,12 @@ namespace Domain.Entities.Aggregates.RequisitionAggregate
             ApprovalFlow = approvalFlow ?? throw new DomainException($"Approval flow not configured", ExceptionCodes.NullApprovalFlow.ToString(), 500);
         }
 
-        public void SetStatus(RequisitionStatus status)
-        {
-            Status = status;
-        }
-
         public void SetRequisitionPending()
         {
             Status = RequisitionStatus.Pending;
         }
 
-        public void ApproveCurrentStep(string approverId, string notes)
+        public void ApproveCurrentStep(string approverId, string? notes)
         {
             if (Status == RequisitionStatus.Pending || Status == RequisitionStatus.InProgress)
             {
@@ -94,10 +90,12 @@ namespace Domain.Entities.Aggregates.RequisitionAggregate
                     {
                         Status = RequisitionStatus.Approved;
                         ApprovedDate = DateTime.UtcNow;
+                        LastDateModified = DateTime.UtcNow;
                     }
                     else
                     {
                         ApprovalFlow.MoveToNextStep();
+                        LastDateModified = DateTime.UtcNow;
                     }
                 }
                 else
@@ -107,20 +105,26 @@ namespace Domain.Entities.Aggregates.RequisitionAggregate
             }
             else
             {
-                throw new DomainException($"Requisition is not in pending state.", ExceptionCodes.InvalidApprovalState.ToString(), 400);
+                throw new DomainException($"Requisition is not in pending or progress state.", ExceptionCodes.InvalidApprovalState.ToString(), 400);
             }
         }
 
         public void RejectCurrentStep(string approverId, string notes)
         {
-            if (Status == RequisitionStatus.Pending)
+            if (Status == RequisitionStatus.Pending || Status == RequisitionStatus.InProgress)
             {
                 var currentApprover = ApprovalFlow.GetCurrentApprover();
                 if (currentApprover.ApproverId == approverId)
                 {
+                    if (string.IsNullOrEmpty(notes))
+                    {
+                        throw new DomainException($"Notes cannot be null or empty when rejecting a requisition.", ExceptionCodes.RejectNotesNull.ToString(), 400);
+                    }
+
                     currentApprover.Reject(notes);
                     Status = RequisitionStatus.Rejected;
                     RejectedDate = DateTime.UtcNow;
+                    LastDateModified = DateTime.UtcNow;
                 }
                 else
                 {
@@ -129,7 +133,7 @@ namespace Domain.Entities.Aggregates.RequisitionAggregate
             }
             else
             {
-                throw new DomainException($"Requisition is not in pending state.", ExceptionCodes.InvalidApprovalState.ToString(), 400);
+                throw new DomainException($"Requisition is not in pending or progress state.", ExceptionCodes.InvalidApprovalState.ToString(), 400);
             }
         }
 
@@ -147,57 +151,15 @@ namespace Domain.Entities.Aggregates.RequisitionAggregate
             }
         }
 
-        public void ProcessAsPurchaseOrder()
-        {
-            if (RequisitionType != RequisitionType.PurchaseOrder)
-            {
-                throw new InvalidOperationException("Requisition type is not PurchaseOrder.");
-            }
-
-            ValidateApproval();
-
-            // Example: Generate order, notify stakeholders, etc.
-
-            Status = RequisitionStatus.Processed;
-            // Set additional properties or perform other actions as needed
-        }
-
-        public void ProcessAsCashAdvance()
-        {
-            if (RequisitionType != RequisitionType.CashAdvance)
-            {
-                throw new InvalidOperationException("Requisition type is not CashAdvance.");
-            }
-
-            ValidateApproval();
-
-            // Example: Disburse funds, record transactions, manage repayments, etc.
-
-            Status = RequisitionStatus.Processed;
-            // Set additional properties or perform other actions as needed
-        }
-
-        public void ProcessAsGrant()
-        {
-            if (RequisitionType != RequisitionType.Grant)
-            {
-                throw new InvalidOperationException("Requisition type is not Grant.");
-            }
-
-            ValidateApproval();
-
-            // Example: Allocate funds, manage reporting requirements, etc.
-
-            Status = RequisitionStatus.Processed;
-            // Set additional properties or perform other actions as needed
-        }
-
-        private void ValidateApproval()
+        public void SetRequisitionToProcessed()
         {
             if (Status != RequisitionStatus.Approved)
             {
-                throw new InvalidOperationException("Requisition must be approved before processing.");
+                throw new DomainException("Requisition must be approved before processing.", ExceptionCodes.InvalidProcessingState.ToString(), 400);
             }
+
+            Status = RequisitionStatus.Processed;
+            LastDateModified = DateTime.UtcNow;
         }
     }
 }

@@ -3,9 +3,11 @@ using Application.Repositories;
 using Application.Services;
 using Infrastructure.Authentication;
 using Infrastructure.Persistence.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Infrastructure.Extensions;
 
@@ -23,7 +25,8 @@ public static class ServiceCollectionExtensions
             .AddScoped<IGrantRepository, GrantRepository>()
             .AddScoped<IPurchaseOrderRepository, PurchaseOrderRepository>()
             .AddScoped<IRequisitionRepository, RequisitionRepository>()
-            .AddScoped<ISubmitterRepository, SubmitterRepository>();
+            .AddScoped<ISubmitterRepository, SubmitterRepository>()
+            .AddScoped<IExpenseHeadRepository, ExpenseHeadRepository>();
     }
 
     public static IServiceCollection AddApplicationServices(this IServiceCollection serviceCollection)

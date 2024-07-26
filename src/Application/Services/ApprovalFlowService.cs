@@ -1,5 +1,4 @@
 ﻿using Application.Configurations;
-using Domain.Constants;
 using Domain.Entities.Aggregates.RequisitionAggregate;
 using Microsoft.Extensions.Options;
 
@@ -22,12 +21,6 @@ namespace Application.Services
 
             //read the approval flow config from settings
             var approvalSteps = new List<string>(_approvalFlowConfig.Value.Steps);
-
-            /* if (submitterRole == Roles.HOD)
-             {
-                 // Remove the first approver if the submitter is HOD
-                 approvalSteps.RemoveAt(0);
-             }*/
 
             // Find the index of the startAfterRole
             int startIndex = approvalSteps.IndexOf(submitterRole);
