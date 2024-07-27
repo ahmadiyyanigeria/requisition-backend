@@ -33,6 +33,7 @@ namespace Infrastructure.Persistence.Repositories
         public async Task<Requisition?> GetByIdAsync(Guid requisitionId)
         {
             return await _context.Requisitions
+                .Include(r => r.Submitter)
                 .Include(r => r.Items)
                 .Include(r => r.Attachments)
                 .Include(r => r.ApprovalFlow)

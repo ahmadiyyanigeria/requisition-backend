@@ -1,10 +1,7 @@
 ﻿using Application.Repositories;
-using Domain.Entities.Aggregates.RequisitionAggregate;
-using Domain.Entities.Aggregates.SubmitterAggregate;
 using Domain.Enums;
 using Domain.Exceptions;
 using Domain.Entities.Common;
-using Mapster;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -35,9 +32,23 @@ namespace Application.Queries
                     _logger.LogError("Requisition with Id {Id} does not exist", request.Id);
                     throw new DomainException($"Requisition with Id {request.Id} does not exists", ExceptionCodes.RequisitionNotFound.ToString(), 404);
                 }
-                return requisition.Adapt<RequisitionResponse>();
+                var approvalList = requisition.ApprovalFlow.ApproverSteps
+                .Select(step => new Approval(step.ApprovalRoles.FirstOrDefault()!, step.Status.ToString())).ToList();
+
+                var submitterName = requisition.Submitter.Name;
+                var items = requisition.Items.Select(a => new Item(a.Description, a.Quantity, a.TotalPrice)).ToList();
+
+                var requisitionResponse = new RequisitionResponse(requisition.RequisitionId, submitterName, requisition.Description, requisition.ExpenseHead, requisition.Status, requisition.RequestedDate, requisition.ApprovedDate, requisition.RejectedDate, requisition.LastDateModified, requisition.TotalAmount, approvalList, requisition.RequisitionType, requisition.Department, items, requisition.Attachments);
+
+                return requisitionResponse;
             }
         }
-        public record RequisitionResponse(Guid RequisitionId, Guid SubmitterId, string Description, string ExpenseHead, RequisitionStatus Status, DateTime RequestedDate, DateTime? ApprovedDate, DateTime? RejectedDate, DateTime? LastDateModified, decimal TotalAmount, ApprovalFlow ApprovalFlow, Guid? ExpenseAccountId, RequisitionType RequisitionType, string Department,List<RequisitionItem> Items, List<Attachment> Attachments);
+        public record RequisitionResponse(Guid RequisitionId, string SubmitterName, string Description, string ExpenseHead, RequisitionStatus Status, DateTime RequestedDate, DateTime? ApprovedDate, DateTime? RejectedDate, DateTime? LastDateModified, decimal TotalAmount, IReadOnlyList<Approval> ApprovalList,RequisitionType RequisitionType, string Department,IReadOnlyList<Item> Items, IReadOnlyList<Attachment> Attachments);
+
+        public record Approval(string Role, string Status);
+
+        public record Item(string Description, int Quantity, decimal TotalPrice);
+
+
     }
 }
