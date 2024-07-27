@@ -43,13 +43,13 @@ namespace Api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetRequisitions([FromQuery]bool? usePaging, [FromQuery] GetPaginatedRequisitions.Query query)
         {
-            if(usePaging.HasValue && !usePaging.Value)
+            if(usePaging.HasValue && usePaging.Value)
             {
-                var requisitions = await _mediator.Send(new GetAllRequisitions.Query());
+                var requisitions = await _mediator.Send(query);
                 return Ok(requisitions);
             }
 
-            var paginatedRequisitions = await _mediator.Send(query);
+            var paginatedRequisitions = await _mediator.Send(new GetAllRequisitions.Query());
             return Ok(paginatedRequisitions);
         }
     }
