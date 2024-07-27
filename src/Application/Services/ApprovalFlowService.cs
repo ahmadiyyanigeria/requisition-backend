@@ -21,6 +21,7 @@ namespace Application.Services
 
             //read the approval flow config from settings
             var approvalSteps = new List<string>(_approvalFlowConfig.Value.Steps);
+            int order = 0;
 
             // Find the index of the startAfterRole
             int startIndex = approvalSteps.IndexOf(submitterRole);
@@ -36,7 +37,8 @@ namespace Application.Services
             foreach (var role in approvalSteps)
             {
                 var approverId = GetRoleUserId(role); // Method to get user ID for the role
-                approvers.AddLast(new ApprovalStep(approvalFlow.ApprovalFlowId, approverId, [role]));
+                approvers.AddLast(new ApprovalStep(approvalFlow.ApprovalFlowId, approverId, role, order));
+                order++;
             }
 
             return approvalFlow;

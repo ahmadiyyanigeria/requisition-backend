@@ -1,6 +1,7 @@
 ﻿using Application.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 using static Application.Commands.CreateRequisition;
 using static Application.Commands.ProcessRequisition;
 
@@ -30,6 +31,13 @@ namespace Api.Controllers
             command.RequisitionId = requisitionId;
             var result = await _mediator.Send(command);
             return Ok(result);
+        }
+
+        [HttpGet("{id:guid}")]
+        public async Task<IActionResult> GetRequisition(Guid id)
+        {
+            var request = await _mediator.Send(new GetRequisition.Query { Id = id });
+            return Ok(request);
         }
 
         [HttpGet]

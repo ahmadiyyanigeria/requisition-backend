@@ -94,10 +94,11 @@ namespace Infrastructure.Persistence.Repositories
         public async Task<Requisition?> GetByIdAsync(Guid requisitionId)
         {
             return await _context.Requisitions
+                .Include(r => r.Submitter)
                 .Include(r => r.Items)
                 .Include(r => r.Attachments)
                 .Include(r => r.ApprovalFlow)
-                .ThenInclude(r => r.ApproverSteps)
+                .ThenInclude(af => af.ApproverSteps.OrderBy(r => r.Order))
                 .FirstOrDefaultAsync(r => r.RequisitionId == requisitionId);
         }
 
