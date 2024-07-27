@@ -45,12 +45,12 @@ namespace Api.Controllers
         {
             if(usePaging.HasValue && usePaging.Value)
             {
-                var requisitions = await _mediator.Send(query);
-                return Ok(requisitions);
+                var paginatedRequisitions = await _mediator.Send(query);
+                return Ok(paginatedRequisitions);
             }
 
-            var paginatedRequisitions = await _mediator.Send(new GetAllRequisitions.Query());
-            return Ok(paginatedRequisitions);
+            var requisitions = await _mediator.Send(new GetAllRequisitions.Query());
+            return Ok(requisitions);
         }
     }
 }
