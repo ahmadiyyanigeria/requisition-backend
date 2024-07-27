@@ -39,5 +39,18 @@ namespace Api.Controllers
             var request = await _mediator.Send(new GetRequisition.Query { Id = id });
             return Ok(request);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetRequisitions([FromQuery]bool? usePaging, [FromQuery] GetPaginatedRequisitions.Query query)
+        {
+            if(usePaging.HasValue && usePaging.Value)
+            {
+                var paginatedRequisitions = await _mediator.Send(query);
+                return Ok(paginatedRequisitions);
+            }
+
+            var requisitions = await _mediator.Send(new GetAllRequisitions.Query());
+            return Ok(requisitions);
+        }
     }
 }
