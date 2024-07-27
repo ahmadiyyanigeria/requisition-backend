@@ -36,7 +36,7 @@ namespace Infrastructure.Persistence.Repositories
                 .Include(r => r.Items)
                 .Include(r => r.Attachments)
                 .Include(r => r.ApprovalFlow)
-                .ThenInclude(r => r.ApproverSteps)
+                .ThenInclude(af => af.ApproverSteps.OrderBy(r => r.Order))
                 .FirstOrDefaultAsync(r => r.RequisitionId == requisitionId);
         }
 
