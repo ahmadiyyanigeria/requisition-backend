@@ -35,20 +35,18 @@ namespace Infrastructure.Persistence.Repositories
                 .ToListAsync();
         }
 
-        public async Task<PaginatedList<Requisition>> GetAllAsync(PageRequest pageRequest, DateTime? startDate, DateTime? endDate, string? expenseHead, string? department, HashSet<int>? statusFilter, HashSet<int>? typeFilter)
+        public async Task<PaginatedList<Requisition>> GetPaginatedAsync(PageRequest pageRequest, DateTime? startDate, DateTime? endDate, string? expenseHead, string? department, HashSet<RequisitionStatus>? statusFilter, HashSet<RequisitionType>? typeFilter)
         {
             var query = _context.Requisitions.Include(r => r.Submitter).AsQueryable();
             // Apply Search 
             if (!string.IsNullOrWhiteSpace(pageRequest?.Keyword))
             {
-                var keyword = pageRequest.Keyword.ToLower();
-
                 var stringProperties = typeof(Requisition).GetProperties()
                     .Where(p => p.PropertyType == typeof(string));
 
                 foreach (var property in stringProperties)
                 {
-                    query = query.Where(r => EF.Functions.Like(EF.Property<string>(r, property.Name).ToLower(), $"%{keyword}%"));
+                    query = query.Where(r => EF.Functions.Like(EF.Property<string>(r, property.Name), $"%{pageRequest.Keyword}%"));
                 }
             }
 
@@ -58,16 +56,16 @@ namespace Infrastructure.Persistence.Repositories
             if (endDate.HasValue && endDate.Value != DateTime.MinValue)
                 query = query.Where(r => r.RequestedDate.Date <= endDate.Value.Date);
             if (!string.IsNullOrWhiteSpace(expenseHead))
-                query = query.Where(r => EF.Functions.Like(r.ExpenseHead.ToLower(), expenseHead.ToLower()));
+                query = query.Where(r => EF.Functions.Like(r.ExpenseHead, expenseHead));
             if (!string.IsNullOrWhiteSpace(department))
-                query = query.Where(r => EF.Functions.Like(r.Department.ToLower(), department.ToLower()));
+                query = query.Where(r => EF.Functions.Like(r.Department, department));
             if (statusFilter?.Any() ?? false)
             {
-                query = query.Where(r => statusFilter.Contains((int)r.RequisitionType));
+                query = query.Where(r => statusFilter.Contains(r.Status));
             }
             if (typeFilter?.Any() ?? false)
             {
-                query = query.Where(r => typeFilter.Contains((int)r.RequisitionType));
+                query = query.Where(r => typeFilter.Contains(r.RequisitionType));
             }
 
             //Apply Sorting
