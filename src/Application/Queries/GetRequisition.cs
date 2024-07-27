@@ -32,8 +32,9 @@ namespace Application.Queries
                     _logger.LogError("Requisition with Id {Id} does not exist", request.Id);
                     throw new DomainException($"Requisition with Id {request.Id} does not exists", ExceptionCodes.RequisitionNotFound.ToString(), 404);
                 }
+
                 var approvalList = requisition.ApprovalFlow.ApproverSteps
-                .Select(step => new Approval(step.ApprovalRoles.FirstOrDefault()!, step.Status.ToString())).ToList();
+                .Select(step => new Approval(step.Role, step.Status.ToString())).ToList();
 
                 var submitterName = requisition.Submitter.Name;
                 var items = requisition.Items.Select(a => new Item(a.Description, a.Quantity, a.TotalPrice)).ToList();
@@ -48,7 +49,5 @@ namespace Application.Queries
         public record Approval(string Role, string Status);
 
         public record Item(string Description, int Quantity, decimal TotalPrice);
-
-
     }
 }
