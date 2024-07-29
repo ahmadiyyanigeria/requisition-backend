@@ -27,17 +27,15 @@ namespace Application.Queries
 
                 public async Task<CashAdvanceResponse> Handle(Query request, CancellationToken cancellationToken)
                 {
-                    var cashAdvance = await _cashAdvanceRepository.GetByIdAsync(m => m.CashAdvanceId == request.Id);
+                    var cashAdvance = await _cashAdvanceRepository.GetByIdAsync(request.Id);
                     if (cashAdvance == null)
                     {
-                        if (cashAdvance == null)
-                        {
                             throw new DomainException(
                                message: "CashAdvance not found",
                                errorCode: ExceptionCodes.Unauthorized.ToString(),
                                statusCode: 404
                            );
-                        }
+                        
                     }
 
                     return cashAdvance.Adapt<CashAdvanceResponse>();
