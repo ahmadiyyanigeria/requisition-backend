@@ -3,6 +3,7 @@ using Application.Repositories;
 using Domain.Entities.Aggregates.RequisitionAggregate;
 using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using System.Linq.Expressions;
 
 namespace Infrastructure.Persistence.Repositories
@@ -37,28 +38,27 @@ namespace Infrastructure.Persistence.Repositories
 
         public async Task<PaginatedList<Requisition>> GetPaginatedAsync(PageRequest pageRequest, DateTime? startDate, DateTime? endDate, string? expenseHead, string? department, HashSet<RequisitionStatus>? statusFilter, HashSet<RequisitionType>? typeFilter)
         {
-            var query = _context.Requisitions.Include(r => r.Submitter).AsQueryable();
-            // Apply Search 
-            if (!string.IsNullOrWhiteSpace(pageRequest?.Keyword))
-            {
-                var stringProperties = typeof(Requisition).GetProperties()
-                    .Where(p => p.PropertyType == typeof(string));
-
-                foreach (var property in stringProperties)
-                {
-                    query = query.Where(r => EF.Functions.Like(EF.Property<string>(r, property.Name), $"%{pageRequest.Keyword}%"));
-                }
-            }
+            var keyword = pageRequest?.Keyword?.ToLower();
+            var rawSql = @"
+                            SELECT * FROM requisitions
+                            WHERE 
+                                (@keyword IS NULL OR LOWER(Department) LIKE '%' || @keyword || '%' 
+                                OR LOWER(Expense_Head) LIKE '%' || @keyword || '%'
+                                OR LOWER(Description) LIKE '%' || @keyword || '%')
+                                AND (@department IS NULL OR LOWER(Department) = LOWER(@department))
+                                AND (@expenseHead IS NULL OR LOWER(Expense_Head) = LOWER(@expenseHead))
+                        ";
+            var query = _context.Requisitions
+                .FromSqlRaw(rawSql, new NpgsqlParameter("keyword", NpgsqlTypes.NpgsqlDbType.Text) { Value = (object)keyword ?? DBNull.Value },
+                                       new NpgsqlParameter("department", NpgsqlTypes.NpgsqlDbType.Text) { Value = (object)department ?? DBNull.Value },
+                                       new NpgsqlParameter("expenseHead", NpgsqlTypes.NpgsqlDbType.Text) { Value = (object)expenseHead ?? DBNull.Value })
+                .AsQueryable();
 
             // Additional filters based on method parameters
             if (startDate.HasValue && startDate.Value != DateTime.MinValue)
-                query = query.Where(r => r.RequestedDate.Date >= startDate.Value.Date);
+                query = query.Where(r => DateOnly.FromDateTime(r.RequestedDate) >= DateOnly.FromDateTime(startDate.Value));
             if (endDate.HasValue && endDate.Value != DateTime.MinValue)
-                query = query.Where(r => r.RequestedDate.Date <= endDate.Value.Date);
-            if (!string.IsNullOrWhiteSpace(expenseHead))
-                query = query.Where(r => EF.Functions.Like(r.ExpenseHead, expenseHead));
-            if (!string.IsNullOrWhiteSpace(department))
-                query = query.Where(r => EF.Functions.Like(r.Department, department));
+                query = query.Where(r => DateOnly.FromDateTime(r.RequestedDate) <= DateOnly.FromDateTime(endDate.Value));
             if (statusFilter?.Any() ?? false)
             {
                 query = query.Where(r => statusFilter.Contains(r.Status));
