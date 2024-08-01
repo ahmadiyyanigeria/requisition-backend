@@ -54,6 +54,11 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
                 .HasForeignKey(po => po.VendorId)
                 .HasConstraintName("fk_vendor_id");
 
+            builder.Property(e => e.SubmitterId)
+               .IsRequired()
+               .HasColumnName("submitter_id")
+               .HasColumnType("uuid");
+
             builder.Property(po => po.AttachmentId)
                .IsRequired()
                .HasColumnName("attachment_id")
