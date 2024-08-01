@@ -1,5 +1,6 @@
 ﻿using Domain.Entities.ValueObjects;
 using Domain.Enums;
+using Domain.Exceptions;
 
 namespace Domain.Entities.Aggregates.GrantAggregate
 {
@@ -9,8 +10,10 @@ namespace Domain.Entities.Aggregates.GrantAggregate
         public Guid RequisitionId { get; private set; }
         public Guid SubmitterId { get; private set; }
         public decimal GrantAmount { get; private set; }
+        public DateTime RequestedDate { get; private set; } = DateTime.UtcNow;
+        public DateTime? DisbursedDate { get; private set; }
         public BankAccount BankAccount { get; private set; } = default!;
-        public GrantStatus Status { get; private set; }
+        public GrantStatus Status { get; private set; } = GrantStatus.Requested;
 
         private Grant() { }
 
@@ -20,26 +23,20 @@ namespace Domain.Entities.Aggregates.GrantAggregate
             RequisitionId = requisitionId;
             SubmitterId = submitterId;
             GrantAmount = grantAmount;
-            Status = GrantStatus.Requested;
             BankAccount = bankAccount;
-        }
-
-        public void Approve()
-        {
-            if (Status == GrantStatus.Requested)
-            {
-                Status = GrantStatus.Approved;
-            }
-            // Consider throwing an exception or handling other cases
         }
 
         public void Disburse()
         {
-            if (Status == GrantStatus.Approved)
+            if (Status == GrantStatus.Requested)
             {
                 Status = GrantStatus.Disbursed;
+                DisbursedDate = DateTime.UtcNow;
             }
-            // Consider throwing an exception or handling other cases
+            else
+            {
+                throw new DomainException($"Grant is not in requested state.");
+            }
         }
     }
 }

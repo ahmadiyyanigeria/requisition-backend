@@ -50,10 +50,6 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
                 .HasColumnName("requested_date")
                 .HasColumnType("timestamp with time zone");
 
-            builder.Property(e => e.ApprovedDate)
-                .HasColumnName("approved_date")
-                .HasColumnType("timestamp with time zone");
-
             builder.Property(e => e.DisbursedDate)
                 .HasColumnName("disbursed_date")
                 .HasColumnType("timestamp with time zone");

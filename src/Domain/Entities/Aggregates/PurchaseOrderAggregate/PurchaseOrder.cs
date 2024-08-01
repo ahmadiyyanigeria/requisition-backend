@@ -1,5 +1,6 @@
 ﻿using Domain.Entities.Common;
 using Domain.Enums;
+using Domain.Exceptions;
 
 namespace Domain.Entities.Aggregates.PurchaseOrderAggregate
 {
@@ -12,7 +13,7 @@ namespace Domain.Entities.Aggregates.PurchaseOrderAggregate
         public DateTime OrderDate { get; private set; } = DateTime.Now;
         public DateTime? DeliveryDate { get; private set; }
         public decimal TotalAmount { get; private set; }
-        public PurchaseOrderStatus Status { get; private set; }
+        public PurchaseOrderStatus Status { get; private set; } = PurchaseOrderStatus.Requested;
         public Guid AttachmentId { get; private set; }
         public Attachment Invoice { get; private set; } = default!;
 
@@ -28,34 +29,19 @@ namespace Domain.Entities.Aggregates.PurchaseOrderAggregate
             RequisitionId = requisitionId;
             VendorId = vendorId;
             Vendor = vendor;
-            Status = PurchaseOrderStatus.Pending;
-        }
-
-        public void Approve()
-        {
-            if (Status == PurchaseOrderStatus.Pending)
-            {
-                Status = PurchaseOrderStatus.Approved;
-            }
-            // Consider throwing an exception or handling other cases
-        }
-
-        public void Reject()
-        {
-            if (Status == PurchaseOrderStatus.Pending)
-            {
-                Status = PurchaseOrderStatus.Rejected;
-            }
-            // Consider throwing an exception or handling other cases
         }
 
         public void Fulfill()
         {
-            if (Status == PurchaseOrderStatus.Approved)
+            if (Status == PurchaseOrderStatus.Requested)
             {
                 Status = PurchaseOrderStatus.Fulfilled;
+                DeliveryDate = DateTime.UtcNow;
             }
-            // Consider throwing an exception or handling other cases
+            else
+            {
+                throw new DomainException($"Purchase order is not in requested state.");
+            }
         }
 
         public void AddItem(PurchaseOrderItem item)

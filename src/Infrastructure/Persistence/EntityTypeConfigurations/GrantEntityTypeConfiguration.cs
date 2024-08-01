@@ -32,6 +32,15 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
                 .HasColumnType("decimal(18, 2)")
                 .HasColumnName("grant_amount");
 
+            builder.Property(e => e.RequestedDate)
+               .IsRequired()
+               .HasColumnName("requested_date")
+               .HasColumnType("timestamp with time zone");
+
+            builder.Property(e => e.DisbursedDate)
+                .HasColumnName("disbursed_date")
+                .HasColumnType("timestamp with time zone");
+
             builder.Property(e => e.Status)
                 .IsRequired()
                 .HasMaxLength(20)

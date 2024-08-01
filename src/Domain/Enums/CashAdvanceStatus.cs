@@ -3,7 +3,6 @@
     public enum CashAdvanceStatus
     {
         Requested,
-        Approved,
         Disbursed,
         Retired
     }

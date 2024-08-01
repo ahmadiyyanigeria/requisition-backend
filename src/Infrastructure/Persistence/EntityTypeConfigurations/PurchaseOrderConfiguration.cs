@@ -41,6 +41,8 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
                 .HasColumnName("total_amount")
                 .HasColumnType("decimal(18,2)");
 
+
+
             builder.Property(po => po.Status)
                 .IsRequired()
                 .HasMaxLength(20)
