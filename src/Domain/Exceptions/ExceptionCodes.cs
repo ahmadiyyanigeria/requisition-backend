@@ -10,5 +10,5 @@ public enum ExceptionCodes
     ExpenseHeadAlreadyExist,
     RequisitionNotFound,
     RejectNotesNull,
-
+    PurchaseOrderNotFound
 }

@@ -6,5 +6,6 @@ namespace Application.Repositories
     {
         Task<PurchaseOrder> AddAsync(PurchaseOrder purchaseOrder);
         Task<PurchaseOrder?> GetByIdAsync(Guid purchaseOrderId);
+        Task<IReadOnlyList<PurchaseOrder>> GetAllPurchaseOrders();
     }
 }
