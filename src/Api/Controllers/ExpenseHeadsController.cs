@@ -5,7 +5,7 @@ using static Application.Commands.CreateExpenseHead;
 
 namespace Api.Controllers
 {
-    [Route("api/v{version:apiVersion}/expenseHeads")]
+    [Route("api/v{version:apiVersion}/expense-heads")]
     [ApiController]
     public class ExpenseHeadsController : ControllerBase
     {

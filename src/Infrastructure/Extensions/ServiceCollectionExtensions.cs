@@ -2,12 +2,11 @@ using Application.Common.Interfaces;
 using Application.Repositories;
 using Application.Services;
 using Infrastructure.Authentication;
+using Infrastructure.Common.Exports;
 using Infrastructure.Persistence.Repositories;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Infrastructure.Extensions;
 
@@ -34,7 +33,9 @@ public static class ServiceCollectionExtensions
         return serviceCollection
             .AddScoped<IApprovalFlowService, ApprovalFlowService>()
             .AddScoped<IUserService, UserService>()
-            .AddScoped<ICurrentUser, CurrentUser>();
+            .AddScoped<IReportExportService, ReportExportService>()
+            .AddScoped<ICurrentUser, CurrentUser>()
+            .AddSingleton<PdfReportGeneratorFactory>();
 
     }
 

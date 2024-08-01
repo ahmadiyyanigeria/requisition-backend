@@ -6,24 +6,25 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class ExpenseTest : Migration
+    public partial class InitialFix : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<DateTime>(
-                name: "LastDateModified",
-                table: "requisitions",
-                type: "timestamp with time zone",
-                nullable: true);
+            migrationBuilder.AddColumn<Guid>(
+                name: "submitter_id",
+                table: "purchase_order",
+                type: "uuid",
+                nullable: false,
+                defaultValue: new Guid("00000000-0000-0000-0000-000000000000"));
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "LastDateModified",
-                table: "requisitions");
+                name: "submitter_id",
+                table: "purchase_order");
         }
     }
 }

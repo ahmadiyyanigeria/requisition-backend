@@ -14,7 +14,9 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
 
             builder.Property(a => a.AttachmentId)
                 .HasColumnName("attachment_id")
-                .ValueGeneratedNever(); 
+                .ValueGeneratedNever()
+                .HasColumnType("uuid");
+
 
             builder.Property(a => a.FileName)
                 .IsRequired()
@@ -33,7 +35,8 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
 
             builder.Property(a => a.UploadedDate)
                 .IsRequired()
-                .HasColumnName("uploaded_date");
+                .HasColumnName("uploaded_date")
+                .HasColumnType("timestamp with time zone");
         }
     }
 }

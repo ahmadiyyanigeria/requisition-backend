@@ -25,7 +25,7 @@ namespace Api.Controllers
             return CreatedAtAction(nameof(CreateRequisition), new { id = requisition }, requisition);
         }
 
-        [HttpPut("{requisitionId}/process")]
+        [HttpPatch("{requisitionId}/process")]
         public async Task<IActionResult> ProcessRequisition([FromRoute] Guid requisitionId, [FromBody] ProcessRequisitionCommand command)
         {
             command.RequisitionId = requisitionId;

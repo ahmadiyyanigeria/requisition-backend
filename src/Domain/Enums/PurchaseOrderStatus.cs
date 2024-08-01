@@ -2,9 +2,7 @@
 {
     public enum PurchaseOrderStatus
     {
-        Pending,
-        Approved,
-        Rejected,
+        Requested,
         Fulfilled,
         Paid
     }

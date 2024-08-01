@@ -47,7 +47,7 @@ namespace Domain.Entities.Aggregates.RequisitionAggregate
         {
             if (item == null)
             {
-                throw new DomainException("Requisition item cannot be null", ExceptionCodes.NullRequisitionItem.ToString(), 400);
+                throw new DomainException("Requisition item cannot be null");
             }
             _items.Add(item);
             CalculateTotalAmount();
@@ -57,7 +57,7 @@ namespace Domain.Entities.Aggregates.RequisitionAggregate
         {
             if (item == null)
             {
-                throw new DomainException("Requisition item cannot be null", ExceptionCodes.NullRequisitionItem.ToString(), 400);
+                throw new DomainException("Requisition item cannot be null");
             }
             _items.Remove(item);
             CalculateTotalAmount();
@@ -70,7 +70,7 @@ namespace Domain.Entities.Aggregates.RequisitionAggregate
 
         public void SetApprovalFlow(ApprovalFlow approvalFlow)
         {
-            ApprovalFlow = approvalFlow ?? throw new DomainException($"Approval flow not configured", ExceptionCodes.NullApprovalFlow.ToString(), 500);
+            ApprovalFlow = approvalFlow ?? throw new DomainException($"Approval flow not configured");
         }
 
         public void SetRequisitionPending()
@@ -100,12 +100,12 @@ namespace Domain.Entities.Aggregates.RequisitionAggregate
                 }
                 else
                 {
-                    throw new DomainException($"You are not authorized to approve this step.", ExceptionCodes.Unauthorized.ToString(), 403);
+                    throw new DomainException($"You are not authorized to approve this step.");
                 }
             }
             else
             {
-                throw new DomainException($"Requisition is not in pending or progress state.", ExceptionCodes.InvalidApprovalState.ToString(), 400);
+                throw new DomainException($"Requisition is not in pending or progress state.");
             }
         }
 
@@ -118,7 +118,7 @@ namespace Domain.Entities.Aggregates.RequisitionAggregate
                 {
                     if (string.IsNullOrEmpty(notes))
                     {
-                        throw new DomainException($"Notes cannot be null or empty when rejecting a requisition.", ExceptionCodes.RejectNotesNull.ToString(), 400);
+                        throw new DomainException($"Notes cannot be null or empty when rejecting a requisition.");
                     }
 
                     currentApprover.Reject(notes);
@@ -128,12 +128,12 @@ namespace Domain.Entities.Aggregates.RequisitionAggregate
                 }
                 else
                 {
-                    throw new DomainException($"You are not authorized to approve this step.", ExceptionCodes.Unauthorized.ToString(), 403);
+                    throw new DomainException($"You are not authorized to approve this step.");
                 }
             }
             else
             {
-                throw new DomainException($"Requisition is not in pending or progress state.", ExceptionCodes.InvalidApprovalState.ToString(), 400);
+                throw new DomainException($"Requisition is not in pending or progress state.");
             }
         }
 
@@ -155,7 +155,7 @@ namespace Domain.Entities.Aggregates.RequisitionAggregate
         {
             if (Status != RequisitionStatus.Approved)
             {
-                throw new DomainException("Requisition must be approved before processing.", ExceptionCodes.InvalidProcessingState.ToString(), 400);
+                throw new DomainException("Requisition must be approved before processing.");
             }
 
             Status = RequisitionStatus.Processed;

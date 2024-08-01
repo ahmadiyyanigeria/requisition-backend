@@ -9,7 +9,7 @@ namespace Domain.Entities.Aggregates.PurchaseOrderAggregate
         public decimal Amount { get; private set; }
         public DateTime PaymentDate { get; private set; }
         public PaymentMethod PaymentMethod { get; private set; }
-        public string ReferenceNumber { get; private set; }
+        public string ReferenceNumber { get; private set; } = default!;
 
         private Payment() { }
         public Payment(decimal amount, PaymentMethod paymentMethod, string referenceNumber, Guid purchaseOrderId)

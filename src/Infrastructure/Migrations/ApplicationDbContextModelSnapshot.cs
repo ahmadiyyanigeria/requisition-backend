@@ -33,34 +33,33 @@ namespace Infrastructure.Migrations
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("advance_amount");
 
+                    b.Property<DateTime?>("DisbursedDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("disbursed_date");
+
+                    b.Property<DateTime>("RequestedDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("requested_date");
+
                     b.Property<Guid>("RequisitionId")
                         .HasColumnType("uuid")
                         .HasColumnName("requisition_id");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("integer")
+                    b.Property<DateTime?>("RetiredDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("retired_date");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
                         .HasColumnName("status");
 
                     b.Property<Guid>("SubmitterId")
                         .HasColumnType("uuid")
                         .HasColumnName("submitter_id");
 
-                    b.Property<Guid>("refund_entry_id")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("reimbursement_entry_id")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("retirement_entry_id")
-                        .HasColumnType("uuid");
-
                     b.HasKey("CashAdvanceId");
-
-                    b.HasIndex("refund_entry_id");
-
-                    b.HasIndex("reimbursement_entry_id");
-
-                    b.HasIndex("retirement_entry_id");
 
                     b.ToTable("cash_advances", (string)null);
                 });
@@ -85,37 +84,48 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("RefundEntryId");
 
+                    b.HasIndex("CashAdvanceId")
+                        .IsUnique();
+
                     b.ToTable("refund_entries", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Aggregates.CashAdvanceAggregate.ReimbursementEntry", b =>
                 {
                     b.Property<Guid>("ReimbursementEntryId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("reimbursement_entry_id");
 
                     b.Property<decimal>("Amount")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("amount");
 
                     b.Property<Guid>("AttachmentId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("attachment_id");
 
                     b.Property<Guid>("CashAdvanceId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("cash_advance_id");
 
                     b.Property<DateTime>("Date")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("date");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("description")
                         .UseCollation("case_insensitive");
 
                     b.HasKey("ReimbursementEntryId");
 
                     b.HasIndex("AttachmentId");
 
-                    b.ToTable("ReimbursementEntry");
+                    b.HasIndex("CashAdvanceId")
+                        .IsUnique();
+
+                    b.ToTable("reimbursement_entries", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Aggregates.CashAdvanceAggregate.RetirementEntry", b =>
@@ -128,6 +138,10 @@ namespace Infrastructure.Migrations
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("amount");
 
+                    b.Property<Guid>("AttachmentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("attachment_id");
+
                     b.Property<Guid>("CashAdvanceId")
                         .HasColumnType("uuid")
                         .HasColumnName("cash_advance_id");
@@ -139,16 +153,16 @@ namespace Infrastructure.Migrations
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
+                        .HasColumnType("text")
                         .HasColumnName("description")
                         .UseCollation("case_insensitive");
 
-                    b.Property<Guid>("receipt_id")
-                        .HasColumnType("uuid");
-
                     b.HasKey("RetirementEntryId");
 
-                    b.HasIndex("receipt_id");
+                    b.HasIndex("AttachmentId");
+
+                    b.HasIndex("CashAdvanceId")
+                        .IsUnique();
 
                     b.ToTable("retirement_entries", (string)null);
                 });
@@ -160,17 +174,26 @@ namespace Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("grant_id");
 
+                    b.Property<DateTime?>("DisbursedDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("disbursed_date");
+
                     b.Property<decimal>("GrantAmount")
                         .HasColumnType("decimal(18, 2)")
                         .HasColumnName("grant_amount");
+
+                    b.Property<DateTime>("RequestedDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("requested_date");
 
                     b.Property<Guid>("RequisitionId")
                         .HasColumnType("uuid")
                         .HasColumnName("requisition_id");
 
-                    b.Property<int>("Status")
+                    b.Property<string>("Status")
+                        .IsRequired()
                         .HasMaxLength(20)
-                        .HasColumnType("integer")
+                        .HasColumnType("varchar(20)")
                         .HasColumnName("status");
 
                     b.Property<Guid>("SubmitterId")
@@ -219,12 +242,13 @@ namespace Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("purchase_order_id");
 
+                    b.Property<Guid>("AttachmentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("attachment_id");
+
                     b.Property<DateTime?>("DeliveryDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("delivery_date");
-
-                    b.Property<Guid>("InvoiceAttachmentId")
-                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("timestamp with time zone")
@@ -234,9 +258,15 @@ namespace Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("requisition_id");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("integer")
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
                         .HasColumnName("status");
+
+                    b.Property<Guid>("SubmitterId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("submitter_id");
 
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("decimal(18,2)")
@@ -248,7 +278,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("PurchaseOrderId");
 
-                    b.HasIndex("InvoiceAttachmentId");
+                    b.HasIndex("AttachmentId");
 
                     b.HasIndex("VendorId");
 
@@ -258,28 +288,36 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.Aggregates.PurchaseOrderAggregate.PurchaseOrderItem", b =>
                 {
                     b.Property<Guid>("PurchaseOrderItemId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("purchase_order_item_id");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text")
+                        .HasColumnName("description")
                         .UseCollation("case_insensitive");
 
                     b.Property<Guid>("PurchaseOrderId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("purchase_order_id");
 
                     b.Property<int>("Quantity")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("quantity");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("total_price");
 
                     b.Property<decimal>("UnitPrice")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("unit_price");
 
                     b.HasKey("PurchaseOrderItemId");
 
                     b.HasIndex("PurchaseOrderId");
 
-                    b.ToTable("PurchaseOrderItems");
+                    b.ToTable("purchase_order_items", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Aggregates.PurchaseOrderAggregate.Vendor", b =>
@@ -294,7 +332,6 @@ namespace Infrastructure.Migrations
                         .UseCollation("case_insensitive");
 
                     b.Property<string>("ContactEmail")
-                        .IsRequired()
                         .HasColumnType("text")
                         .UseCollation("case_insensitive");
 
@@ -497,40 +534,42 @@ namespace Infrastructure.Migrations
                 {
                     b.Property<Guid>("SubmitterId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("submitter_id");
 
                     b.Property<string>("Department")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("department")
                         .UseCollation("case_insensitive");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("email")
                         .UseCollation("case_insensitive");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("name")
                         .UseCollation("case_insensitive");
 
                     b.Property<string>("Position")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("position")
                         .UseCollation("case_insensitive");
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("user_id")
                         .UseCollation("case_insensitive");
 
                     b.HasKey("SubmitterId");
 
-                    b.ToTable("Submitters");
+                    b.ToTable("submitter", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Common.Attachment", b =>
@@ -588,52 +627,108 @@ namespace Infrastructure.Migrations
                     b.ToTable("expense_head", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.Entities.Common.Role", b =>
-                {
-                    b.Property<Guid>("RoleId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .UseCollation("case_insensitive");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .UseCollation("case_insensitive");
-
-                    b.HasKey("RoleId");
-
-                    b.ToTable("Roles");
-                });
-
             modelBuilder.Entity("Domain.Entities.Aggregates.CashAdvanceAggregate.CashAdvance", b =>
                 {
-                    b.HasOne("Domain.Entities.Aggregates.CashAdvanceAggregate.RefundEntry", "RefundEntry")
-                        .WithMany()
-                        .HasForeignKey("refund_entry_id")
+                    b.OwnsOne("Domain.Entities.ValueObjects.BankAccount", "BankAccount", b1 =>
+                        {
+                            b1.Property<Guid>("CashAdvanceId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("AccountName")
+                                .IsRequired()
+                                .HasColumnType("varchar(100)")
+                                .HasColumnName("account_name")
+                                .UseCollation("case_insensitive");
+
+                            b1.Property<string>("AccountNumber")
+                                .IsRequired()
+                                .HasColumnType("varchar(50)")
+                                .HasColumnName("bank_account_number")
+                                .UseCollation("case_insensitive");
+
+                            b1.Property<string>("BankName")
+                                .IsRequired()
+                                .HasColumnType("varchar(100)")
+                                .HasColumnName("bank_name")
+                                .UseCollation("case_insensitive");
+
+                            b1.Property<string>("IBAN")
+                                .IsRequired()
+                                .HasColumnType("varchar(34)")
+                                .HasColumnName("iban")
+                                .UseCollation("case_insensitive");
+
+                            b1.Property<string>("SWIFT")
+                                .IsRequired()
+                                .HasColumnType("varchar(11)")
+                                .HasColumnName("swift")
+                                .UseCollation("case_insensitive");
+
+                            b1.HasKey("CashAdvanceId");
+
+                            b1.ToTable("cash_advances");
+
+                            b1.WithOwner()
+                                .HasForeignKey("CashAdvanceId");
+                        });
+
+                    b.Navigation("BankAccount")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.Entities.Aggregates.CashAdvanceAggregate.RefundEntry", b =>
+                {
+                    b.HasOne("Domain.Entities.Aggregates.CashAdvanceAggregate.CashAdvance", null)
+                        .WithOne("RefundEntry")
+                        .HasForeignKey("Domain.Entities.Aggregates.CashAdvanceAggregate.RefundEntry", "CashAdvanceId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Aggregates.CashAdvanceAggregate.ReimbursementEntry", "ReimbursementEntry")
-                        .WithMany()
-                        .HasForeignKey("reimbursement_entry_id")
-                        .OnDelete(DeleteBehavior.Restrict)
+                    b.OwnsOne("Domain.Entities.ValueObjects.BankAccount", "BankAccount", b1 =>
+                        {
+                            b1.Property<Guid>("RefundEntryId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("AccountName")
+                                .IsRequired()
+                                .HasColumnType("varchar(100)")
+                                .HasColumnName("account_name")
+                                .UseCollation("case_insensitive");
+
+                            b1.Property<string>("AccountNumber")
+                                .IsRequired()
+                                .HasColumnType("varchar(50)")
+                                .HasColumnName("bank_account_number")
+                                .UseCollation("case_insensitive");
+
+                            b1.Property<string>("BankName")
+                                .IsRequired()
+                                .HasColumnType("varchar(100)")
+                                .HasColumnName("bank_name")
+                                .UseCollation("case_insensitive");
+
+                            b1.Property<string>("IBAN")
+                                .IsRequired()
+                                .HasColumnType("varchar(34)")
+                                .HasColumnName("iban")
+                                .UseCollation("case_insensitive");
+
+                            b1.Property<string>("SWIFT")
+                                .IsRequired()
+                                .HasColumnType("varchar(11)")
+                                .HasColumnName("swift")
+                                .UseCollation("case_insensitive");
+
+                            b1.HasKey("RefundEntryId");
+
+                            b1.ToTable("refund_entries");
+
+                            b1.WithOwner()
+                                .HasForeignKey("RefundEntryId");
+                        });
+
+                    b.Navigation("BankAccount")
                         .IsRequired();
-
-                    b.HasOne("Domain.Entities.Aggregates.CashAdvanceAggregate.RetirementEntry", "RetirementEntry")
-                        .WithMany()
-                        .HasForeignKey("retirement_entry_id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("RefundEntry");
-
-                    b.Navigation("ReimbursementEntry");
-
-                    b.Navigation("RetirementEntry");
                 });
 
             modelBuilder.Entity("Domain.Entities.Aggregates.CashAdvanceAggregate.ReimbursementEntry", b =>
@@ -644,6 +739,12 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Domain.Entities.Aggregates.CashAdvanceAggregate.CashAdvance", null)
+                        .WithOne("ReimbursementEntry")
+                        .HasForeignKey("Domain.Entities.Aggregates.CashAdvanceAggregate.ReimbursementEntry", "CashAdvanceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Receipt");
                 });
 
@@ -651,11 +752,66 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Entities.Common.Attachment", "Receipt")
                         .WithMany()
-                        .HasForeignKey("receipt_id")
+                        .HasForeignKey("AttachmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Aggregates.CashAdvanceAggregate.CashAdvance", null)
+                        .WithOne("RetirementEntry")
+                        .HasForeignKey("Domain.Entities.Aggregates.CashAdvanceAggregate.RetirementEntry", "CashAdvanceId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Receipt");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Aggregates.GrantAggregate.Grant", b =>
+                {
+                    b.OwnsOne("Domain.Entities.ValueObjects.BankAccount", "BankAccount", b1 =>
+                        {
+                            b1.Property<Guid>("GrantId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("AccountName")
+                                .IsRequired()
+                                .HasColumnType("varchar(100)")
+                                .HasColumnName("account_name")
+                                .UseCollation("case_insensitive");
+
+                            b1.Property<string>("AccountNumber")
+                                .IsRequired()
+                                .HasColumnType("varchar(50)")
+                                .HasColumnName("bank_account_number")
+                                .UseCollation("case_insensitive");
+
+                            b1.Property<string>("BankName")
+                                .IsRequired()
+                                .HasColumnType("varchar(100)")
+                                .HasColumnName("bank_name")
+                                .UseCollation("case_insensitive");
+
+                            b1.Property<string>("IBAN")
+                                .IsRequired()
+                                .HasColumnType("varchar(34)")
+                                .HasColumnName("iban")
+                                .UseCollation("case_insensitive");
+
+                            b1.Property<string>("SWIFT")
+                                .IsRequired()
+                                .HasColumnType("varchar(11)")
+                                .HasColumnName("swift")
+                                .UseCollation("case_insensitive");
+
+                            b1.HasKey("GrantId");
+
+                            b1.ToTable("grant");
+
+                            b1.WithOwner()
+                                .HasForeignKey("GrantId");
+                        });
+
+                    b.Navigation("BankAccount")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Domain.Entities.Aggregates.PurchaseOrderAggregate.Payment", b =>
@@ -671,7 +827,7 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Entities.Common.Attachment", "Invoice")
                         .WithMany()
-                        .HasForeignKey("InvoiceAttachmentId")
+                        .HasForeignKey("AttachmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -692,7 +848,7 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.Aggregates.PurchaseOrderAggregate.PurchaseOrder", null)
                         .WithMany("Items")
                         .HasForeignKey("PurchaseOrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -759,7 +915,7 @@ namespace Infrastructure.Migrations
 
                             b1.HasKey("RequisitionId");
 
-                            b1.ToTable("BankAccounts");
+                            b1.ToTable("requisitions");
 
                             b1.WithOwner()
                                 .HasForeignKey("RequisitionId");
@@ -784,6 +940,15 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.Aggregates.RequisitionAggregate.Requisition", null)
                         .WithMany("Attachments")
                         .HasForeignKey("RequisitionId");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Aggregates.CashAdvanceAggregate.CashAdvance", b =>
+                {
+                    b.Navigation("RefundEntry");
+
+                    b.Navigation("ReimbursementEntry");
+
+                    b.Navigation("RetirementEntry");
                 });
 
             modelBuilder.Entity("Domain.Entities.Aggregates.PurchaseOrderAggregate.PurchaseOrder", b =>

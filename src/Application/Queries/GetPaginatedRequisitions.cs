@@ -14,18 +14,8 @@ namespace Application.Queries
             public DateTime? EndDate { get; set; }
             public string? ExpenseHead { get; set; }
             public string? Department { get; set; }
-            public string? StatusFilter { get; set; }
-            public string? TypeFilter { get; set; }
-            public HashSet<RequisitionStatus> RequisitionStatuses => string.IsNullOrWhiteSpace(StatusFilter) ? new HashSet<RequisitionStatus>() : StatusFilter.Split(',')
-            .Select(s => Enum.TryParse<RequisitionStatus>(s, out var requisitionStatus) ? requisitionStatus : (RequisitionStatus?)null)
-            .Where(g => g.HasValue)
-            .Select(g => g.Value)
-            .ToHashSet();          
-            public HashSet<RequisitionType> RequisitionTypes => string.IsNullOrWhiteSpace(TypeFilter) ? new HashSet<RequisitionType>() : TypeFilter.Split(',')
-            .Select(s => Enum.TryParse<RequisitionType>(s, out var requisitionType) ? requisitionType : (RequisitionType?)null)
-            .Where(g => g.HasValue)
-            .Select(g => g.Value)
-            .ToHashSet();
+            public HashSet<RequisitionStatus> StatusFilter { get; set; } = default!;
+            public HashSet<RequisitionType> TypeFilter { get; set; } = default!;
         }
 
         public record RequisitionResponse
@@ -58,7 +48,7 @@ namespace Application.Queries
                     Keyword = request.Keyword,
                     SortBy = request.SortBy
                 };
-                var requisitions = await _requisitionRepository.GetPaginatedAsync(pageRequest, request.StartDate, request.EndDate, request.ExpenseHead, request.Department, request.RequisitionStatuses, request.RequisitionTypes);
+                var requisitions = await _requisitionRepository.GetPaginatedAsync(pageRequest, request.StartDate, request.EndDate, request.ExpenseHead, request.Department, request.StatusFilter, request.TypeFilter);
                 return requisitions.Adapt<PaginatedList<RequisitionResponse>>();
             }      
         }
