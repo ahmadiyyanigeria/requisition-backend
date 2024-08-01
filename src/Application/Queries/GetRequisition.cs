@@ -1,9 +1,10 @@
 ﻿using Application.Repositories;
 using Domain.Enums;
-using Domain.Exceptions;
 using Domain.Entities.Common;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Application.Exceptions;
+using ApplicationException = Application.Exceptions.ApplicationException;
 
 namespace Application.Queries
 {
@@ -30,7 +31,7 @@ namespace Application.Queries
                 if (requisition is null)
                 {
                     _logger.LogError("Requisition with Id {Id} does not exist", request.Id);
-                    throw new DomainException($"Requisition with Id {request.Id} does not exists", ExceptionCodes.RequisitionNotFound.ToString(), 404);
+                    throw new ApplicationException($"Requisition with Id {request.Id} does not exists", ExceptionCodes.RequisitionNotFound.ToString(), 404);
                 }
 
                 var approvalList = requisition.ApprovalFlow.ApproverSteps

@@ -1,6 +1,6 @@
 ﻿using Domain.Entities.ValueObjects;
 using Domain.Enums;
-using System;
+using Domain.Exceptions;
 
 namespace Domain.Entities.Aggregates.CashAdvanceAggregate
 {
@@ -10,39 +10,36 @@ namespace Domain.Entities.Aggregates.CashAdvanceAggregate
         public Guid RequisitionId { get; private set; }
         public Guid SubmitterId { get; private set; }
         public decimal AdvanceAmount { get; private set; }
-       // public BankAccount BankAccount { get; private set; }
-        public CashAdvanceStatus Status { get; private set; }
-        public RetirementEntry RetirementEntry { get; private set; }
-        public RefundEntry RefundEntry { get; private set; }
-        public ReimbursementEntry ReimbursementEntry { get; private set; }
+        public BankAccount BankAccount { get; private set; } = default!;
+        public CashAdvanceStatus Status { get; private set; } = CashAdvanceStatus.Requested;
+        public DateTime RequestedDate { get; private set; } = DateTime.UtcNow;
+        public DateTime? DisbursedDate { get; private set; } 
+        public DateTime? RetiredDate { get; private set; } 
+        public RetirementEntry? RetirementEntry { get; private set; }
+        public RefundEntry? RefundEntry { get; private set; }
+        public ReimbursementEntry? ReimbursementEntry { get; private set; }
 
         private CashAdvance() { }
-        public CashAdvance(Guid requisitionId, Guid submitterId, decimal advanceAmount)
+        public CashAdvance(Guid requisitionId, Guid submitterId, decimal advanceAmount, BankAccount bankAccount)
         {
             CashAdvanceId = Guid.NewGuid();
             RequisitionId = requisitionId;
             SubmitterId = submitterId;
             AdvanceAmount = advanceAmount;
-           // BankAccount = bankAccount;
-            Status = CashAdvanceStatus.Requested;
-        }
-
-        public void Approve()
-        {
-            if (Status == CashAdvanceStatus.Requested)
-            {
-                Status = CashAdvanceStatus.Approved;
-            }
-            // Consider throwing an exception or handling other cases
+            BankAccount = bankAccount;
         }
 
         public void Disburse()
         {
-            if (Status == CashAdvanceStatus.Approved)
+            if (Status == CashAdvanceStatus.Requested)
             {
                 Status = CashAdvanceStatus.Disbursed;
+                DisbursedDate = DateTime.UtcNow;
             }
-            // Consider throwing an exception or handling other cases
+            else
+            {
+                throw new DomainException($"Cash advance is not in requested state.");
+            }
         }
 
         public void Retire(RetirementEntry retirementEntry)
@@ -51,8 +48,12 @@ namespace Domain.Entities.Aggregates.CashAdvanceAggregate
             {
                 RetirementEntry = retirementEntry;
                 Status = CashAdvanceStatus.Retired;
+                RetiredDate = DateTime.UtcNow;
             }
-            // Consider throwing an exception or handling other cases
+            else
+            {
+                throw new DomainException($"Cash advance is not in disbursed state.");
+            }
         }
 
         public void AddRefundEntry(RefundEntry refundEntry)
@@ -61,7 +62,10 @@ namespace Domain.Entities.Aggregates.CashAdvanceAggregate
             {
                 RefundEntry = refundEntry;
             }
-            // Consider throwing an exception or handling other cases
+            else
+            {
+                throw new DomainException($"Cash advance is not in retired state.");
+            }
         }
 
         public void AddReimbursementEntry(ReimbursementEntry reimbursementEntry)
@@ -70,7 +74,10 @@ namespace Domain.Entities.Aggregates.CashAdvanceAggregate
             {
                 ReimbursementEntry = reimbursementEntry;
             }
-            // Consider throwing an exception or handling other cases
+            else
+            {
+                throw new DomainException($"Cash advance is not in retired state.");
+            }
         }
     }
 }

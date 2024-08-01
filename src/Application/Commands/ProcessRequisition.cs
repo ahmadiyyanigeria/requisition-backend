@@ -1,8 +1,8 @@
 ﻿using Application.Common.Interfaces;
 using Application.Repositories;
-using Domain.Entities.Common;
-using Domain.Exceptions;
 using MediatR;
+using Application.Exceptions;
+using ApplicationException = Application.Exceptions.ApplicationException;
 
 namespace Application.Commands
 {
@@ -39,7 +39,7 @@ namespace Application.Commands
                 var user = _user.GetUserDetails();
                 string approverId = user.UserId;
 
-                var requisition = await _requisitionRepository.GetByIdAsync(request.RequisitionId) ?? throw new DomainException("Requisition not found", ExceptionCodes.RequisitionNotFound.ToString(), 400);
+                var requisition = await _requisitionRepository.GetByIdAsync(request.RequisitionId) ?? throw new ApplicationException("Requisition not found", ExceptionCodes.RequisitionNotFound.ToString(), 400);
 
                 // Process the action
                 if (request.Action == RequisitionAction.Approve)
@@ -50,7 +50,7 @@ namespace Application.Commands
                 {
                     if (string.IsNullOrEmpty(request.Notes))
                     {
-                        throw new DomainException($"Notes cannot be null or empty when rejecting a requisition.", ExceptionCodes.RejectNotesNull.ToString(), 400);
+                        throw new ApplicationException($"Notes cannot be null or empty when rejecting a requisition.", ExceptionCodes.RejectNotesNull.ToString(), 400);
                     }
                     requisition.RejectCurrentStep(approverId, request.Notes);
                 }

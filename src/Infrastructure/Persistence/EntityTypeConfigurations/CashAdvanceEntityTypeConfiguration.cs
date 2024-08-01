@@ -19,15 +19,20 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
 
             builder.Property(e => e.CashAdvanceId)
                 .HasColumnName("cash_advance_id")
-                .ValueGeneratedNever();
+                .ValueGeneratedNever()
+                .HasColumnType("uuid");
+
 
             builder.Property(e => e.RequisitionId)
                 .IsRequired()
-                .HasColumnName("requisition_id");
+                .HasColumnName("requisition_id")
+                .HasColumnType("uuid");
+
 
             builder.Property(e => e.SubmitterId)
                 .IsRequired()
-                .HasColumnName("submitter_id");
+                .HasColumnName("submitter_id")
+                .HasColumnType("uuid");
 
             builder.Property(e => e.AdvanceAmount)
                 .IsRequired()
@@ -36,23 +41,65 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
 
             builder.Property(e => e.Status)
                 .IsRequired()
+                .HasMaxLength(20)
                 .HasColumnName("status")
-                .HasConversion<int>();
+                .HasColumnType("varchar(20)");
 
+            builder.Property(e => e.RequestedDate)
+                .IsRequired()
+                .HasColumnName("requested_date")
+                .HasColumnType("timestamp with time zone");
+
+            builder.Property(e => e.DisbursedDate)
+                .HasColumnName("disbursed_date")
+                .HasColumnType("timestamp with time zone");
+
+            builder.Property(e => e.RetiredDate)
+                .HasColumnName("retired_date")
+                .HasColumnType("timestamp with time zone");
+
+            // Configure relationships
             builder.HasOne(e => e.RetirementEntry)
-                .WithMany()
-                .HasForeignKey("retirement_entry_id")
+                .WithOne()
+                .HasForeignKey<RetirementEntry>(re => re.CashAdvanceId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(e => e.RefundEntry)
-                .WithMany()
-                .HasForeignKey("refund_entry_id")
+                .WithOne()
+                .HasForeignKey<RefundEntry>(re => re.CashAdvanceId) // Adjust as necessary
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(e => e.ReimbursementEntry)
-                .WithMany()
-                .HasForeignKey("reimbursement_entry_id")
+                .WithOne()
+                .HasForeignKey<ReimbursementEntry>(re => re.CashAdvanceId) // Adjust as necessary
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Configure BankAccount as a value object
+            builder.OwnsOne(e => e.BankAccount, ba =>
+            {
+                ba.Property(b => b.AccountNumber)
+                    .HasColumnName("bank_account_number")
+                    .IsRequired()
+                    .HasColumnType("varchar(50)");
+
+                ba.Property(b => b.BankName)
+                    .HasColumnName("bank_name")
+                    .IsRequired()
+                    .HasColumnType("varchar(100)");
+
+                ba.Property(b => b.AccountName)
+                    .HasColumnName("account_name")
+                    .IsRequired()
+                    .HasColumnType("varchar(100)");
+
+                ba.Property(b => b.IBAN)
+                    .HasColumnName("iban")
+                    .HasColumnType("varchar(34)");
+
+                ba.Property(b => b.SWIFT)
+                    .HasColumnName("swift")
+                    .HasColumnType("varchar(11)");
+            });
         }
     }
 }

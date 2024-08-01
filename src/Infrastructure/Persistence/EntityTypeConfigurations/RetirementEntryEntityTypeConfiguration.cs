@@ -1,11 +1,6 @@
 ﻿using Domain.Entities.Aggregates.CashAdvanceAggregate;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Persistence.EntityTypeConfigurations
 {
@@ -19,16 +14,19 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
 
             builder.Property(e => e.RetirementEntryId)
                 .HasColumnName("retirement_entry_id")
-                .ValueGeneratedNever();
+                .ValueGeneratedNever()
+                .HasColumnType("uuid");
 
             builder.Property(e => e.CashAdvanceId)
                 .IsRequired()
-                .HasColumnName("cash_advance_id");
+                .HasColumnName("cash_advance_id")
+                .HasColumnType("uuid");
 
             builder.Property(e => e.Description)
                 .IsRequired()
                 .HasColumnName("description")
-                .HasMaxLength(500);
+                .HasMaxLength(500)
+                .HasColumnType("text");
 
             builder.Property(e => e.Amount)
                 .IsRequired()
@@ -37,14 +35,13 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
 
             builder.Property(e => e.Date)
                 .IsRequired()
-                .HasColumnName("date");
+                .HasColumnName("date")
+                .HasColumnType("timestamp with time zone");
 
-            builder.HasOne(e => e.Receipt)
-                .WithMany()
-                .HasForeignKey("receipt_id")
-                .OnDelete(DeleteBehavior.Restrict);
-
-            
+            builder.Property(e => e.AttachmentId)
+             .IsRequired()
+             .HasColumnName("attachment_id")
+             .HasColumnType("uuid");
         }
     }
 }

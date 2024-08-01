@@ -36,6 +36,24 @@ namespace Infrastructure.Persistence.Repositories
                 .ToListAsync();
         }
 
+
+        public async Task<IReadOnlyList<Requisition>> GetAllAsync(DateTime? startDate = null, DateTime? endDate = null)
+        {
+            IQueryable<Requisition> query = _context.Requisitions.Include(r => r.Submitter);
+
+            if (startDate.HasValue)
+            {
+                query = query.Where(r => r.RequestedDate >= startDate.Value);
+            }
+
+            if (endDate.HasValue)
+            {
+                query = query.Where(r => r.RequestedDate <= endDate.Value);
+            }
+
+            return await query.ToListAsync();
+        }
+
         public async Task<PaginatedList<Requisition>> GetPaginatedAsync(PageRequest pageRequest, DateTime? startDate, DateTime? endDate, string? expenseHead, string? department, HashSet<RequisitionStatus>? statusFilter, HashSet<RequisitionType>? typeFilter)
         {
             var keyword = pageRequest?.Keyword?.ToLower();
