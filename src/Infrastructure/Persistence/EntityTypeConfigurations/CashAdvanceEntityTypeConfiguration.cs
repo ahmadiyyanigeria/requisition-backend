@@ -62,19 +62,20 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
                 .HasColumnName("retired_date")
                 .HasColumnType("timestamp with time zone");
 
+            // Configure relationships
             builder.HasOne(e => e.RetirementEntry)
                 .WithOne()
-                .HasForeignKey("retirement_entry_id")
+                .HasForeignKey<RetirementEntry>(re => re.CashAdvanceId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(e => e.RefundEntry)
                 .WithOne()
-                .HasForeignKey("refund_entry_id")
+                .HasForeignKey<RefundEntry>(re => re.CashAdvanceId) // Adjust as necessary
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(e => e.ReimbursementEntry)
                 .WithOne()
-                .HasForeignKey("reimbursement_entry_id")
+                .HasForeignKey<ReimbursementEntry>(re => re.CashAdvanceId) // Adjust as necessary
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Configure BankAccount as a value object
