@@ -9,20 +9,19 @@ namespace Domain.Entities.Aggregates.GrantAggregate
         public Guid RequisitionId { get; private set; }
         public Guid SubmitterId { get; private set; }
         public decimal GrantAmount { get; private set; }
-        //public string AccountNumber { get; private set; }
-       // public BankAccount BankAccount { get; private set; }
+        public BankAccount BankAccount { get; private set; } = default!;
         public GrantStatus Status { get; private set; }
 
         private Grant() { }
 
-        public Grant(Guid requisitionId, Guid submitterId, decimal grantAmount)
+        public Grant(Guid requisitionId, Guid submitterId, decimal grantAmount, BankAccount bankAccount)
         {
             GrantId = Guid.NewGuid();
             RequisitionId = requisitionId;
             SubmitterId = submitterId;
             GrantAmount = grantAmount;
-            //AccountNumber = bankAccount;
             Status = GrantStatus.Requested;
+            BankAccount = bankAccount;
         }
 
         public void Approve()

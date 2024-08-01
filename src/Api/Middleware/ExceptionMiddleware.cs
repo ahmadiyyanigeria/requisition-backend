@@ -3,6 +3,8 @@ using System.Text.Json.Serialization;
 using Domain.Exceptions;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using Application.Exceptions;
+using ApplicationException = Application.Exceptions.ApplicationException;
 
 namespace Api.Middleware;
 
@@ -54,6 +56,18 @@ public class ExceptionMiddleware
 
         }
         catch (DomainException exception)
+        {
+            _logger.LogWarning(message: "A domain exception has occurred while executing the request.\n{ErrorMessage}", exception.Message);
+            var problemDetail = new ProblemDetails
+            {
+                Detail = exception.Message,
+                Instance = context.Request.Path,
+            };
+            await Results.Json(problemDetail,
+                options: _jsonSerializerOptions
+            ).ExecuteAsync(context);
+        }
+        catch (ApplicationException exception)
         {
             _logger.LogWarning(message: "A domain exception has occurred while executing the request.\n{ErrorMessage}", exception.Message);
             var error = _errors[exception.HttpStatusCode];

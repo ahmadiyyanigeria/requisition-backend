@@ -10,20 +10,24 @@ namespace Domain.Entities.Aggregates.CashAdvanceAggregate
         public Guid RequisitionId { get; private set; }
         public Guid SubmitterId { get; private set; }
         public decimal AdvanceAmount { get; private set; }
-       // public BankAccount BankAccount { get; private set; }
+        public BankAccount BankAccount { get; private set; } = default!;
         public CashAdvanceStatus Status { get; private set; }
-        public RetirementEntry RetirementEntry { get; private set; }
-        public RefundEntry RefundEntry { get; private set; }
-        public ReimbursementEntry ReimbursementEntry { get; private set; }
+        public DateTime RequestedDate { get; private set; } = DateTime.UtcNow;
+        public DateTime? ApprovedDate { get; private set; } 
+        public DateTime? DisbursedDate { get; private set; } 
+        public DateTime? RetiredDate { get; private set; } 
+        public RetirementEntry? RetirementEntry { get; private set; }
+        public RefundEntry? RefundEntry { get; private set; }
+        public ReimbursementEntry? ReimbursementEntry { get; private set; }
 
         private CashAdvance() { }
-        public CashAdvance(Guid requisitionId, Guid submitterId, decimal advanceAmount)
+        public CashAdvance(Guid requisitionId, Guid submitterId, decimal advanceAmount, BankAccount bankAccount)
         {
             CashAdvanceId = Guid.NewGuid();
             RequisitionId = requisitionId;
             SubmitterId = submitterId;
             AdvanceAmount = advanceAmount;
-           // BankAccount = bankAccount;
+            BankAccount = bankAccount;
             Status = CashAdvanceStatus.Requested;
         }
 

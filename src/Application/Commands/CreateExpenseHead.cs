@@ -1,7 +1,8 @@
 ﻿using MediatR;
 using Application.Repositories;
 using Domain.Entities.Common;
-using Domain.Exceptions;
+using Application.Exceptions;
+using ApplicationException = Application.Exceptions.ApplicationException;
 
 namespace Application.Commands
 {
@@ -29,7 +30,7 @@ namespace Application.Commands
                 var expenseHeadExist = await _expenseHeadRepository.ExistAsync(request.Name);
                 if(expenseHeadExist)
                 {
-                    throw new DomainException("Expense head already exist", ExceptionCodes.ExpenseHeadAlreadyExist.ToString(), 400);
+                    throw new ApplicationException("Expense head already exist", ExceptionCodes.ExpenseHeadAlreadyExist.ToString(), 400);
                 }
                 //creating the Expense Head object
                 var expenseHead = new ExpenseHead(

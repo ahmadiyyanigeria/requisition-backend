@@ -8,26 +8,39 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
     {
         public void Configure(EntityTypeBuilder<Submitter> builder)
         {
+            builder.ToTable("submitter");
+
             builder.HasKey(s => s.SubmitterId);
 
-            builder.Property(s => s.SubmitterId)
-                .IsRequired();
+            builder.Property(e => e.SubmitterId)
+                .IsRequired()
+                .HasColumnName("submitter_id")
+                .HasColumnType("uuid");
+
+            builder.Property(s => s.UserId)
+               .IsRequired()
+               .HasColumnName("user_id")
+               .HasColumnType("varchar(100)");
 
             builder.Property(s => s.Name)
                 .IsRequired()
-                .HasMaxLength(100);
+                .HasColumnName("name")
+                .HasColumnType("varchar(100)");
 
             builder.Property(s => s.Email)
                 .IsRequired()
-                .HasMaxLength(100);
+                .HasColumnName("email")
+                .HasColumnType("varchar(100)");
 
             builder.Property(s => s.Position)
                 .IsRequired()
-                .HasMaxLength(100);
+                .HasColumnName("position")
+                .HasColumnType("varchar(100)");
 
             builder.Property(s => s.Department)
                 .IsRequired()
-                .HasMaxLength(100);
+                .HasColumnName("department")
+                .HasColumnType("varchar(100)");
         }
     }
 }

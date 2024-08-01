@@ -4,7 +4,7 @@
     {
         public Guid PurchaseOrderItemId { get; private set; }
         public Guid PurchaseOrderId { get; private set; }
-        public string Description { get; private set; }
+        public string Description { get; private set; } = default!;
         public int Quantity { get; private set; }
         public decimal UnitPrice { get; private set; }
         public decimal TotalPrice => Quantity * UnitPrice;
