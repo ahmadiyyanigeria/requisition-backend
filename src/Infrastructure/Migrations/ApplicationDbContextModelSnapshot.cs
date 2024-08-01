@@ -33,10 +33,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("advance_amount");
 
-                    b.Property<DateTime?>("ApprovedDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("approved_date");
-
                     b.Property<DateTime?>("DisbursedDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("disbursed_date");
@@ -178,9 +174,17 @@ namespace Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("grant_id");
 
+                    b.Property<DateTime?>("DisbursedDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("disbursed_date");
+
                     b.Property<decimal>("GrantAmount")
                         .HasColumnType("decimal(18, 2)")
                         .HasColumnName("grant_amount");
+
+                    b.Property<DateTime>("RequestedDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("requested_date");
 
                     b.Property<Guid>("RequisitionId")
                         .HasColumnType("uuid")
@@ -324,7 +328,6 @@ namespace Infrastructure.Migrations
                         .UseCollation("case_insensitive");
 
                     b.Property<string>("ContactEmail")
-                        .IsRequired()
                         .HasColumnType("text")
                         .UseCollation("case_insensitive");
 
@@ -618,27 +621,6 @@ namespace Infrastructure.Migrations
                     b.HasKey("Name");
 
                     b.ToTable("expense_head", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Entities.Common.Role", b =>
-                {
-                    b.Property<Guid>("RoleId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .UseCollation("case_insensitive");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .UseCollation("case_insensitive");
-
-                    b.HasKey("RoleId");
-
-                    b.ToTable("Roles");
                 });
 
             modelBuilder.Entity("Domain.Entities.Aggregates.CashAdvanceAggregate.CashAdvance", b =>
