@@ -46,6 +46,7 @@ namespace Application.Commands
                 {
                     throw new ApplicationException($"Requisition has not been approved.", ExceptionCodes.InvalidProcessingState.ToString(), 400);
                 }
+
                 var purchaseOrder = new PurchaseOrder(request.RequisitionId, request.VendorId, submitter.SubmitterId);
                 var purchaseOrderItems = requisition.Items.Select(r => new PurchaseOrderItem(r.Description, r.Quantity, r.UnitPrice, purchaseOrder.PurchaseOrderId));
                 foreach ( var item in purchaseOrderItems )

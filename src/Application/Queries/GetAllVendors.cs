@@ -1,15 +1,18 @@
 ﻿using Application.Repositories;
+using Mapster;
 using MediatR;
 
 namespace Application.Queries
 {
     public class GetAllVendors
     {
-        public record VendorQuery : IRequest<List<string>>
+        public record VendorQuery : IRequest<List<VendorResponse>>
         {
         }
 
-        public class Handler : IRequestHandler<VendorQuery, List<string>>
+        public record VendorResponse(Guid VendorId, string Name, string Address, string ContactPerson, string ContactEmail, string ContactPhone);
+
+        public class Handler : IRequestHandler<VendorQuery, List<VendorResponse>>
         {
             private readonly IVendorRepository _vendorRepository;
             public Handler(IVendorRepository vendorRepository)
@@ -17,11 +20,10 @@ namespace Application.Queries
                 _vendorRepository = vendorRepository;
             }
 
-            public async Task<List<string>> Handle(VendorQuery request, CancellationToken cancellationToken)
+            public async Task<List<VendorResponse>> Handle(VendorQuery request, CancellationToken cancellationToken)
             {
                 var vendors = await _vendorRepository.GetAllAsync();
-                var response = vendors.Select(n => n.Name).ToList();
-                return response;
+                return vendors.Adapt<List<VendorResponse>>();
             }   
         }
     }

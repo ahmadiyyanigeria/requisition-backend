@@ -78,9 +78,45 @@ namespace Domain.Entities.Aggregates.RequisitionAggregate
             Status = RequisitionStatus.Pending;
         }
 
+        public void SetRequisitionClosed()
+        {
+            Status = RequisitionStatus.Closed;
+        }
+
+        public void SetRequisitionProcessed(RequisitionType type)
+        {
+            if(Status == RequisitionStatus.Approved)
+            {
+                if (type is RequisitionType.CashAdvance)
+                {
+                    Status = RequisitionStatus.CAGenerated;
+                }
+                else if (type is RequisitionType.Grant)
+                {
+                    Status = RequisitionStatus.GrantGenerated;
+                }
+                else if (type is RequisitionType.PurchaseOrder)
+                {
+                    Status = RequisitionStatus.POGenerated;
+                }
+            }
+            else if(Status == RequisitionStatus.CAGenerated || Status == RequisitionStatus.POGenerated || Status == RequisitionStatus.POGenerated)
+            {
+                throw new DomainException($"Requisition already processed.");
+            }
+            else if(Status == RequisitionStatus.Closed)
+            {
+                throw new DomainException($"Requisition already closed.");
+            }
+            else
+            {
+                throw new DomainException($"Requisition has not been approved.");
+            }
+        }
+
         public void ApproveCurrentStep(string approverId, string? notes)
         {
-            if (Status == RequisitionStatus.Pending || Status == RequisitionStatus.InProgress)
+            if (Status == RequisitionStatus.Pending || Status == RequisitionStatus.InApproval)
             {
                 var currentApprover = ApprovalFlow.GetCurrentApprover();
                 if (currentApprover.ApproverId == approverId)
@@ -111,7 +147,7 @@ namespace Domain.Entities.Aggregates.RequisitionAggregate
 
         public void RejectCurrentStep(string approverId, string notes)
         {
-            if (Status == RequisitionStatus.Pending || Status == RequisitionStatus.InProgress)
+            if (Status == RequisitionStatus.Pending || Status == RequisitionStatus.InApproval)
             {
                 var currentApprover = ApprovalFlow.GetCurrentApprover();
                 if (currentApprover.ApproverId == approverId)

@@ -41,7 +41,7 @@ namespace Application.Queries
 
             }
         }
-        public record PurchaseOrderResponse(Guid PurchaseOrderId, Guid RequisitionId, DateTime OrderDate, decimal TotalAmount, DateTime DeliveryDate, Vendor vendor, PurchaseOrderStatus Status, Attachment Invoice, IReadOnlyList<PurchaseOrderItem> Items, IReadOnlyList<Payment> Payments);
+        public record PurchaseOrderResponse(Guid PurchaseOrderId, Guid RequisitionId, DateTime OrderDate, decimal TotalAmount, DateTime DeliveryDate,PurchaseOrderStatus Status, IReadOnlyList<PurchaseOrderItem> Items, IReadOnlyList<Payment> Payments);
         
     }
 }

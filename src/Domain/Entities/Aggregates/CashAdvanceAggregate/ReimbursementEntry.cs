@@ -9,8 +9,8 @@ namespace Domain.Entities.Aggregates.CashAdvanceAggregate
         public string Description { get; private set; } = default!;
         public decimal Amount { get; private set; }
         public DateTime Date { get; private set; } = DateTime.UtcNow;
-        public Guid AttachmentId { get; private set; }
-        public Attachment Receipt { get; private set; } = default!;
+        //public Guid AttachmentId { get; private set; }
+        //public Attachment Receipt { get; private set; } = default!;
 
         private ReimbursementEntry() { }
 
@@ -19,7 +19,7 @@ namespace Domain.Entities.Aggregates.CashAdvanceAggregate
             CashAdvanceId = cashAdvanceId;
             Description = description;
             Amount = amount;
-            AttachmentId = receiptId;
+            //AttachmentId = receiptId;
         }
     }
 }
