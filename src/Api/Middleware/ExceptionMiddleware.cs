@@ -1,9 +1,8 @@
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Domain.Exceptions;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using Application.Exceptions;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using ApplicationException = Application.Exceptions.ApplicationException;
 
 namespace Api.Middleware;
