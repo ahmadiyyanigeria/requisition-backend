@@ -1,47 +1,37 @@
 ﻿using Application.Paging;
 using Application.Repositories;
-using Domain.Entities.Aggregates.SubmitterAggregate;
+using Domain.Entities.Aggregates.PurchaseOrderAggregate;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Repositories
 {
-    public class SubmitterRepository : ISubmitterRepository
+    public class VendorRepository : IVendorRepository
     {
         private readonly ApplicationDbContext _context;
 
-        public SubmitterRepository(ApplicationDbContext context)
+        public VendorRepository(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        public async Task<Submitter> AddAsync(Submitter submitter)
+        public async Task<Vendor> AddAsync(Vendor vendor)
         {
-            await _context.Submitters.AddAsync(submitter);
-            return submitter;
+            await _context.AddAsync(vendor);
+            return vendor;
         }
 
-        public async Task<Submitter?> GetByEmailAsync(string email)
+        public async Task<bool> ExistAsync(string name)
         {
-            return await _context.Submitters.FirstOrDefaultAsync(g => g.Email == email);
+            return await _context.Vendors.AnyAsync(n => n.Name == name);
         }
 
-        public async Task<Submitter?> GetByUserIdAsync(string userId)
+        public async Task<PaginatedList<Vendor>> GetVendors(PageRequest pageRequest, bool usePaging = true)
         {
-            return await _context.Submitters.FirstOrDefaultAsync(g => g.UserId == userId);
-        }
-
-        public async Task<Submitter?> GetByIdAsync(Guid submitterId)
-        {
-            return await _context.Submitters.FirstOrDefaultAsync(g => g.SubmitterId == submitterId);
-        }
-
-        public async Task<PaginatedList<Submitter>> GetSubmitters(PageRequest pageRequest, bool usePaging = true)
-        {
-            var query = _context.Submitters.AsQueryable();
+            var query = _context.Vendors.AsQueryable();
 
             if (!string.IsNullOrEmpty(pageRequest?.Keyword))
             {
-                var helper = new EntitySearchHelper<Submitter>(_context);
+                var helper = new EntitySearchHelper<Vendor>(_context);
                 query = helper.SearchEntity(pageRequest.Keyword);
             }
 
@@ -59,6 +49,10 @@ namespace Infrastructure.Persistence.Repositories
                 var result = await query.ToListAsync();
                 return result.ToPaginatedList(totalItemsCount, 1, totalItemsCount);
             }
+        }
+        public async Task<Vendor?> GetByIdAsync(Guid id)
+        {
+            return await _context.Vendors.SingleOrDefaultAsync(n => n.VendorId == id);
         }
     }
 }

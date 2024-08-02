@@ -59,11 +59,11 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
                .HasColumnName("submitter_id")
                .HasColumnType("uuid");
 
-            builder.Property(po => po.AttachmentId)
+           /* builder.Property(po => po.AttachmentId)
                .IsRequired()
                .HasColumnName("attachment_id")
                .HasColumnType("uuid");
-
+*/
             // Configure PurchaseOrderItems as a collection
             builder.HasMany(e => e.Items)
                 .WithOne()

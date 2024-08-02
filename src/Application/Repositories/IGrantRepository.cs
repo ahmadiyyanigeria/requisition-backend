@@ -1,4 +1,5 @@
-﻿using Domain.Entities.Aggregates.GrantAggregate;
+﻿using Application.Paging;
+using Domain.Entities.Aggregates.GrantAggregate;
 
 namespace Application.Repositories
 {
@@ -6,5 +7,6 @@ namespace Application.Repositories
     {
         Task<Grant> AddAsync(Grant grant);
         Task<Grant?> GetByIdAsync(Guid grantId);
+        Task<PaginatedList<Grant>> GetGrants(PageRequest pageRequest, bool usePaging = true);
     }
 }

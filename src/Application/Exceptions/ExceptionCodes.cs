@@ -8,6 +8,7 @@ public enum ExceptionCodes
     NullApprovalFlow,
     NullRequisitionItem,
     ExpenseHeadAlreadyExist,
+    VendorAlreadyExist,
     RequisitionNotFound,
     RejectNotesNull,
 

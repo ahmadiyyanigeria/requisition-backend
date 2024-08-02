@@ -57,18 +57,24 @@ public class ExceptionMiddleware
         catch (DomainException exception)
         {
             _logger.LogWarning(message: "A domain exception has occurred while executing the request.\n{ErrorMessage}", exception.Message);
-            var problemDetail = new ProblemDetails
+            var error = _errors[400];
+            var problem = new ProblemDetails
             {
+                Title = error.Title,
                 Detail = exception.Message,
+                Status = StatusCodes.Status400BadRequest,
                 Instance = context.Request.Path,
+                Type = error.Type
             };
-            await Results.Json(problemDetail,
-                options: _jsonSerializerOptions
+            await Results.Json(
+                problem,
+                options: _jsonSerializerOptions,
+                statusCode: StatusCodes.Status500InternalServerError
             ).ExecuteAsync(context);
         }
         catch (ApplicationException exception)
         {
-            _logger.LogWarning(message: "A domain exception has occurred while executing the request.\n{ErrorMessage}", exception.Message);
+            _logger.LogWarning(message: "An application exception has occurred while executing the request.\n{ErrorMessage}", exception.Message);
             var error = _errors[exception.HttpStatusCode];
             var problemDetail = new ProblemDetails
             {
