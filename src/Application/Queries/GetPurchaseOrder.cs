@@ -7,6 +7,7 @@ using Mapster;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using static Application.Queries.GetPurchaseOrder;
+using ApplicationException = Application.Exceptions.ApplicationException;
 
 namespace Application.Queries
 {
@@ -33,7 +34,7 @@ namespace Application.Queries
                 if (purchaseOrder is null)
                 {
                     _logger.LogError("Purchase order with Id {Id} does not exist", request.Id);
-                    throw new DomainException($"Purchase with Id {request.Id} does not exists", ExceptionCodes.PurchaseOrderNotFound.ToString(), 404);
+                    throw new ApplicationException($"Purchase with Id {request.Id} does not exists", ExceptionCodes.PurchaseOrderNotFound.ToString(), 404);
                 }
                 var purchaseOrderResponse = purchaseOrder.Adapt<PurchaseOrderResponse>();
                 return purchaseOrderResponse;
