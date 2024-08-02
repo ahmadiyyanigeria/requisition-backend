@@ -64,7 +64,7 @@ namespace Application.Queries
                 var totalRequests = expenses.Count;
                 var totalApprovedRequests = GetCountByStatus(expenses, RequisitionStatus.Approved);
                 var totalRejectedRequests = GetCountByStatus(expenses, RequisitionStatus.Rejected);
-                var totalInProgressRequests = GetCountByStatus(expenses, RequisitionStatus.InProgress);
+                var totalInProgressRequests = GetCountByStatus(expenses, RequisitionStatus.InApproval);
                 var totalPendingRequests = GetCountByStatus(expenses, RequisitionStatus.Pending);
                 var totalProcessedRequests = GetCountByStatus(expenses, RequisitionStatus.Processed);
 
@@ -80,9 +80,9 @@ namespace Application.Queries
                 var expensePendingCountByCategories = GroupCountByStatus(expenses, RequisitionStatus.Pending, e => e.ExpenseHead.ToString());
                 var expensePendingCountByDepartments = GroupCountByStatus(expenses, RequisitionStatus.Pending, e => e.Department.ToString());
 
-                var expenseInProgressCountByTypes = GroupCountByStatus(expenses, RequisitionStatus.InProgress, e => e.RequisitionType.ToString());
-                var expenseInProgressCountByCategories = GroupCountByStatus(expenses, RequisitionStatus.InProgress, e => e.ExpenseHead.ToString());
-                var expenseInProgressCountByDepartments = GroupCountByStatus(expenses, RequisitionStatus.InProgress, e => e.Department.ToString());
+                var expenseInProgressCountByTypes = GroupCountByStatus(expenses, RequisitionStatus.InApproval, e => e.RequisitionType.ToString());
+                var expenseInProgressCountByCategories = GroupCountByStatus(expenses, RequisitionStatus.InApproval, e => e.ExpenseHead.ToString());
+                var expenseInProgressCountByDepartments = GroupCountByStatus(expenses, RequisitionStatus.InApproval, e => e.Department.ToString());
 
                 var expenseRejectedCountByTypes = GroupCountByStatus(expenses, RequisitionStatus.Rejected, e => e.RequisitionType.ToString());
                 var expenseRejectedCountByCategories = GroupCountByStatus(expenses, RequisitionStatus.Rejected, e => e.ExpenseHead.ToString());

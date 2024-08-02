@@ -33,10 +33,10 @@ namespace Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetPurchaseOrders()
+        public async Task<IActionResult> GetPurchaseOrders([FromQuery] GetAllPurchaseOrders.Query query)
         {
-            var purchaseOders = await _mediator.Send(new GetAllPurchaseOrders.Query());
-            return Ok(purchaseOders);
+            var purchaseOrders = await _mediator.Send(query);
+            return Ok(purchaseOrders);
         }
     }
 }

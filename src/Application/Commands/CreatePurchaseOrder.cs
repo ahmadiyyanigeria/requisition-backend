@@ -2,7 +2,6 @@
 using Application.Repositories;
 using Domain.Entities.Aggregates.PurchaseOrderAggregate;
 using Domain.Entities.Aggregates.SubmitterAggregate;
-using Domain.Entities.Common;
 using Domain.Enums;
 using Domain.Exceptions;
 using MediatR;
@@ -42,9 +41,9 @@ namespace Application.Commands
                 var submitter = new Submitter(user.UserId, user.Name, user.Email, user.Role, department);
 
                 var requisition = await _requisitionRepository.GetByIdAsync(request.RequisitionId);
-                if (requisition is null || requisition.Status != RequisitionStatus.Approved)
+                if (requisition is null)
                 {
-                    throw new ApplicationException($"Requisition has not been approved.", ExceptionCodes.InvalidProcessingState.ToString(), 400);
+                    throw new ApplicationException($"Requisition not found.", ExceptionCodes.RequisitionNotFound.ToString(), 404);
                 }
 
                 var purchaseOrder = new PurchaseOrder(request.RequisitionId, request.VendorId, submitter.SubmitterId);
@@ -53,7 +52,11 @@ namespace Application.Commands
                 {
                     purchaseOrder.AddItem(item);
                 }
+
+                requisition.SetRequisitionProcessed(requisition.RequisitionType);
+
                 await _purchaseOrderRepository.AddAsync(purchaseOrder);
+                await _requisitionRepository.UpdateAsync(requisition);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
                 return purchaseOrder.PurchaseOrderId; 
             }

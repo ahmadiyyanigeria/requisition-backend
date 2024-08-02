@@ -1,4 +1,5 @@
-﻿using Application.Repositories;
+﻿using Application.Paging;
+using Application.Repositories;
 using Domain.Enums;
 using Mapster;
 using MediatR;
@@ -7,9 +8,9 @@ namespace Application.Queries
 {
     public class GetAllPurchaseOrders
     {
-        public record Query : IRequest<List<PurchaseOrderResponse>>
+        public record Query : PageRequest, IRequest<PaginatedList<PurchaseOrderResponse>>
         {
-
+            public bool UsePaging { get; init; } = true;
         }
 
         public record PurchaseOrderResponse
@@ -23,7 +24,7 @@ namespace Application.Queries
             public PurchaseOrderStatus Status { get; private set; }
         }
 
-        public class Handler : IRequestHandler<Query, List<PurchaseOrderResponse>>
+        public class Handler : IRequestHandler<Query, PaginatedList<PurchaseOrderResponse>>
         {
             private readonly IPurchaseOrderRepository _purchaseOrderRepository;
 
@@ -31,10 +32,10 @@ namespace Application.Queries
             {
                 _purchaseOrderRepository = purchaseOrderRepository;
             }
-            public async Task<List<PurchaseOrderResponse>> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<PaginatedList<PurchaseOrderResponse>> Handle(Query request, CancellationToken cancellationToken)
             {
-                var purchaseOrders = await _purchaseOrderRepository.GetAllPurchaseOrders();
-                return purchaseOrders.Adapt<List<PurchaseOrderResponse>>();
+                var purchaseOrders = await _purchaseOrderRepository.GetPurchaseOrders(request, request.UsePaging);
+                return purchaseOrders.Adapt<PaginatedList<PurchaseOrderResponse>>();
             }
         }
     }
