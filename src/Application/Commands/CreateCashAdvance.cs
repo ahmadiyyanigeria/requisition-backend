@@ -1,39 +1,43 @@
 ﻿using Application.Common.Interfaces;
 using Application.Repositories;
+using Domain.Entities.Aggregates.CashAdvanceAggregate;
 using Domain.Entities.Aggregates.PurchaseOrderAggregate;
 using Domain.Entities.Aggregates.SubmitterAggregate;
+using Domain.Entities.ValueObjects;
 using Domain.Enums;
 using Domain.Exceptions;
+using Mapster;
 using MediatR;
 using ApplicationException = Application.Exceptions.ApplicationException;
 
 namespace Application.Commands
 {
-    public  class CreatePurchaseOrder 
+    public  class CreateCashAdvance
     {
-        public class CreatePurchaseOrderCommand : IRequest<Guid>
+        public class CreateCashAdvanceCommand : IRequest<CashAdvanceResponse>
         {
             public Guid RequisitionId { get; init; }
-            public Guid VendorId { get; init; }
             public string Notes { get; init; } = default!;
         }
 
-        public class Handler : IRequestHandler<CreatePurchaseOrderCommand, Guid>
+        public record CashAdvanceResponse(Guid CashAdvanceId, Guid RequisitionId, Guid SubmitterId, decimal AdvanceAmount, CashAdvanceStatus Status, BankAccount BankAccount, string Notes);
+
+        public class Handler : IRequestHandler<CreateCashAdvanceCommand, CashAdvanceResponse>
         {
-            private readonly IPurchaseOrderRepository _purchaseOrderRepository;
+            private readonly ICashAdvanceRepository _cashAdvanceRepository;
             private readonly IUnitOfWork _unitOfWork;
             private readonly IRequisitionRepository _requisitionRepository;
             private readonly ICurrentUser _user;
 
-            public Handler(IPurchaseOrderRepository purchaseOrderRepository, IUnitOfWork unitOfWork, IRequisitionRepository requisitionRepository, ICurrentUser user)
+            public Handler(ICashAdvanceRepository cashAdvanceRepository, IUnitOfWork unitOfWork, IRequisitionRepository requisitionRepository, ICurrentUser user)
             {
-                _purchaseOrderRepository = purchaseOrderRepository;
+                _cashAdvanceRepository = cashAdvanceRepository;
                 _unitOfWork = unitOfWork;
                 _requisitionRepository = requisitionRepository; 
                 _user = user;
             }
 
-            public async Task<Guid> Handle(CreatePurchaseOrderCommand request, CancellationToken cancellationToken)
+            public async Task<CashAdvanceResponse> Handle(CreateCashAdvanceCommand request, CancellationToken cancellationToken)
             {
                 var user = _user.GetUserDetails();
                 string department = "Account";
@@ -46,20 +50,19 @@ namespace Application.Commands
                 {
                     throw new ApplicationException($"Requisition not found.", ExceptionCodes.RequisitionNotFound.ToString(), 404);
                 }
-
-                var purchaseOrder = new PurchaseOrder(request.RequisitionId, request.VendorId, submitter.SubmitterId, request.Notes);
-                var purchaseOrderItems = requisition.Items.Select(r => new PurchaseOrderItem(r.Description, r.Quantity, r.UnitPrice, purchaseOrder.PurchaseOrderId));
-                foreach ( var item in purchaseOrderItems )
+                if (requisition.BankAccount is null)
                 {
-                    purchaseOrder.AddItem(item);
+                    throw new ApplicationException($"Bank account details not provided.", ExceptionCodes.BankDetailsNotProvided.ToString(), 400);
                 }
+
+                var cashAdvance = new CashAdvance(request.RequisitionId, submitter.SubmitterId, request.Notes, requisition.TotalAmount, requisition.BankAccount!);
 
                 requisition.SetRequisitionProcessed(requisition.RequisitionType);
 
-                await _purchaseOrderRepository.AddAsync(purchaseOrder);
+                await _cashAdvanceRepository.AddAsync(cashAdvance);
                 await _requisitionRepository.UpdateAsync(requisition);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
-                return purchaseOrder.PurchaseOrderId; 
+                return cashAdvance.Adapt<CashAdvanceResponse>(); 
             }
         }
     }

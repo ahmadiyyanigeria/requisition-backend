@@ -1,9 +1,7 @@
 ﻿using Application.Queries;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using static Application.Commands.CreatePurchaseOrder;
-using static Application.Commands.CreateRequisition;
 
 namespace Api.Controllers
 {
@@ -33,7 +31,7 @@ namespace Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetPurchaseOrders([FromQuery] GetAllPurchaseOrders.Query query)
+        public async Task<IActionResult> GetPurchaseOrders([FromQuery] GetPurchaseOrders.Query query)
         {
             var purchaseOrders = await _mediator.Send(query);
             return Ok(purchaseOrders);

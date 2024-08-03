@@ -54,16 +54,21 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
                 .HasForeignKey(po => po.VendorId)
                 .HasConstraintName("fk_vendor_id");
 
-            builder.Property(e => e.SubmitterId)
+            builder.Property(e => e.ProcessorId)
                .IsRequired()
-               .HasColumnName("submitter_id")
+               .HasColumnName("processor_id")
                .HasColumnType("uuid");
 
-           /* builder.Property(po => po.AttachmentId)
-               .IsRequired()
-               .HasColumnName("attachment_id")
-               .HasColumnType("uuid");
-*/
+            builder.Property(e => e.Notes)
+            .IsRequired()
+            .HasColumnName("notes")
+            .HasColumnType("text");
+
+            /* builder.Property(po => po.AttachmentId)
+                .IsRequired()
+                .HasColumnName("attachment_id")
+                .HasColumnType("uuid");
+ */
             // Configure PurchaseOrderItems as a collection
             builder.HasMany(e => e.Items)
                 .WithOne()

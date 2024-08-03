@@ -8,7 +8,8 @@ namespace Domain.Entities.Aggregates.CashAdvanceAggregate
     {
         public Guid CashAdvanceId { get; private set; }
         public Guid RequisitionId { get; private set; }
-        public Guid SubmitterId { get; private set; }
+        public Guid ProcessorId { get; private set; }
+        public string Notes { get; private set; } = default!;
         public decimal AdvanceAmount { get; private set; }
         public BankAccount BankAccount { get; private set; } = default!;
         public CashAdvanceStatus Status { get; private set; } = CashAdvanceStatus.Requested;
@@ -20,11 +21,12 @@ namespace Domain.Entities.Aggregates.CashAdvanceAggregate
         public ReimbursementEntry? ReimbursementEntry { get; private set; }
 
         private CashAdvance() { }
-        public CashAdvance(Guid requisitionId, Guid submitterId, decimal advanceAmount, BankAccount bankAccount)
+        public CashAdvance(Guid requisitionId, Guid processorId, string note, decimal advanceAmount, BankAccount bankAccount)
         {
             CashAdvanceId = Guid.NewGuid();
             RequisitionId = requisitionId;
-            SubmitterId = submitterId;
+            Notes = note;
+            ProcessorId = processorId;
             AdvanceAmount = advanceAmount;
             BankAccount = bankAccount;
         }

@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Application.Queries
 {
-    public class GetAllPurchaseOrders
+    public class GetPurchaseOrders
     {
         public record Query : PageRequest, IRequest<PaginatedList<PurchaseOrderResponse>>
         {

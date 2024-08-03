@@ -8,7 +8,8 @@ namespace Domain.Entities.Aggregates.PurchaseOrderAggregate
     {
         public Guid PurchaseOrderId { get; private set; }
         public Guid RequisitionId { get; private set; }
-        public Guid SubmitterId { get; private set; }
+        public Guid ProcessorId { get; private set; }
+        public string Notes { get; private set; } = default!;
         public Guid VendorId { get; private set; }
         public Vendor Vendor { get; private set; } = default!;
         public DateTime OrderDate { get; private set; } = DateTime.UtcNow;
@@ -24,12 +25,13 @@ namespace Domain.Entities.Aggregates.PurchaseOrderAggregate
         public IReadOnlyList<Payment> Payments => _payments.AsReadOnly();
 
         private PurchaseOrder() { }
-        public PurchaseOrder(Guid requisitionId, Guid vendorId, Guid submitterId)
+        public PurchaseOrder(Guid requisitionId, Guid vendorId, Guid processorId, string note)
         {
             PurchaseOrderId = Guid.NewGuid();
             RequisitionId = requisitionId;
             VendorId = vendorId;
-            SubmitterId = submitterId;
+            ProcessorId = processorId;
+            Notes = note;
         }
 
         public void Fulfill()
