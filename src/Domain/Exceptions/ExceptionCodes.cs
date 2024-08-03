@@ -9,6 +9,7 @@ public enum ExceptionCodes
     NullRequisitionItem,
     ExpenseHeadAlreadyExist,
     RequisitionNotFound,
+    CashAdvanceNotFound,
     RejectNotesNull,
     PurchaseOrderNotFound
 }
