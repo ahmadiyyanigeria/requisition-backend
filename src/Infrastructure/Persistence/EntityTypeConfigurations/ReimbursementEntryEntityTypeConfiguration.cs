@@ -1,4 +1,4 @@
-﻿/*using Domain.Entities.Aggregates.CashAdvanceAggregate;
+﻿using Domain.Entities.Aggregates.CashAdvanceAggregate;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -14,15 +14,18 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
 
             builder.Property(e => e.ReimbursementEntryId)
                 .HasColumnName("reimbursement_entry_id")
-                .ValueGeneratedNever(); // Assuming you generate this outside of EF Core
+                .ValueGeneratedNever()
+                .HasColumnType("uuid");
 
             builder.Property(e => e.CashAdvanceId)
                 .IsRequired()
-                .HasColumnName("cash_advance_id");
+                .HasColumnName("cash_advance_id")
+                .HasColumnType("uuid");
 
             builder.Property(e => e.Description)
                 .IsRequired()
-                .HasColumnName("description");
+                .HasColumnName("description")
+                .HasColumnType("varchar(200)");
 
             builder.Property(e => e.Amount)
                 .HasColumnType("decimal(18,2)")
@@ -31,21 +34,13 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
 
             builder.Property(e => e.Date)
                 .IsRequired()
-                .HasColumnName("date");
+                .HasColumnName("date")
+                .HasColumnType("timestamp with time zone");
 
-            builder.Property(e => e.AttachmentId)
+            /*builder.Property(e => e.AttachmentId)
                 .IsRequired()
-                .HasColumnName("attachment_id");
-
-            // Assuming Attachment is a complex type or owned entity
-            builder.OwnsOne(e => e.Receipt, attachment =>
-            {
-                attachment.Property<Guid>("AttachmentId").HasColumnName("attachment_id");
-                attachment.Property(att => att.FileName).HasColumnName("file_name").HasColumnType("varchar(255)");
-                attachment.Property(att => att.FileType).HasColumnName("file_type").HasColumnType("varchar(50)");
-                attachment.Property(att => att.FileContent).HasColumnName("file_content").HasColumnType("text");
-            });
+                .HasColumnName("attachment_id")
+                .HasColumnType("uuid");*/
         }
     }
 }
-*/

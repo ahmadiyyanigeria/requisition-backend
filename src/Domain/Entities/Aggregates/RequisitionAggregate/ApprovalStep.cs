@@ -5,25 +5,25 @@ namespace Domain.Entities.Aggregates.RequisitionAggregate
     public class ApprovalStep
     {
         public Guid ApprovalStepId { get; private set; } = Guid.NewGuid();
-        public string ApproverId { get; private set; }
+        public string ApproverId { get; private set; } = default!;
         public Guid ApprovalFlowId { get; private set; }
         public ApprovalStatus Status { get; private set; } = ApprovalStatus.Pending;
         public DateTime ApprovalDate { get; private set; }
         public string? Notes { get; private set; }
-        private readonly List<string> _approvalRoles;
-
-        public IReadOnlyList<string> ApprovalRoles => _approvalRoles.AsReadOnly();
+        public int Order { get; private set; }
+        public string Role { get; private set; } = default!;
 
         private ApprovalStep() { }
 
-        public ApprovalStep(Guid approvalFlowId, string approverId, List<string> approverRoles)
+        public ApprovalStep(Guid approvalFlowId, string approverId, string role, int order)
         {
             ApprovalFlowId = approvalFlowId;
             ApproverId = approverId;
-            _approvalRoles = approverRoles ?? [];
+            Order = order;
+            Role = role;
         }
 
-        public void Approve(string notes)
+        public void Approve(string? notes)
         {
             Status = ApprovalStatus.Approved;
             ApprovalDate = DateTime.UtcNow;

@@ -2,6 +2,7 @@ using Application.Common.Interfaces;
 using Application.Repositories;
 using Application.Services;
 using Infrastructure.Authentication;
+using Infrastructure.Common.Exports;
 using Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -22,8 +23,10 @@ public static class ServiceCollectionExtensions
             .AddScoped<ICashAdvanceRepository, CashAdvanceRepository>()
             .AddScoped<IGrantRepository, GrantRepository>()
             .AddScoped<IPurchaseOrderRepository, PurchaseOrderRepository>()
+            .AddScoped<IVendorRepository, VendorRepository>()
             .AddScoped<IRequisitionRepository, RequisitionRepository>()
-            .AddScoped<ISubmitterRepository, SubmitterRepository>();
+            .AddScoped<ISubmitterRepository, SubmitterRepository>()
+            .AddScoped<IExpenseHeadRepository, ExpenseHeadRepository>();
     }
 
     public static IServiceCollection AddApplicationServices(this IServiceCollection serviceCollection)
@@ -31,7 +34,9 @@ public static class ServiceCollectionExtensions
         return serviceCollection
             .AddScoped<IApprovalFlowService, ApprovalFlowService>()
             .AddScoped<IUserService, UserService>()
-            .AddScoped<ICurrentUser, CurrentUser>();
+            .AddScoped<IReportExportService, ReportExportService>()
+            .AddScoped<ICurrentUser, CurrentUser>()
+            .AddSingleton<PdfReportGeneratorFactory>();
 
     }
 

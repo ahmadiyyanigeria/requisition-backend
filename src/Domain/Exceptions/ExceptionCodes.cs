@@ -4,6 +4,11 @@ public enum ExceptionCodes
 {
     Unauthorized,
     InvalidApprovalState,
+    InvalidProcessingState,
     NullApprovalFlow,
-    NullRequisitionItem
+    NullRequisitionItem,
+    ExpenseHeadAlreadyExist,
+    RequisitionNotFound,
+    RejectNotesNull,
+    PurchaseOrderNotFound
 }
