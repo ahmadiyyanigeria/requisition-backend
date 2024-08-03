@@ -7,9 +7,11 @@ using Domain.Entities.Aggregates.SubmitterAggregate;
 using Domain.Entities.Common;
 using Domain.Entities.ValueObjects;
 using Domain.Enums;
+using Domain.Exceptions;
 using FluentValidation;
 using MediatR;
 using static Application.Commands.CreateRequisition;
+using ApplicationException = Application.Exceptions.ApplicationException;
 
 namespace Application.Commands
 {
@@ -59,15 +61,16 @@ namespace Application.Commands
             public async Task<Guid> Handle(CreateRequisitionCommand request, CancellationToken cancellationToken)
             {
                 //get current logged in user //userId, userrole, name, department, email, phonenumber
-                //assumptions
-                string userId = "1";
-                string name = "test";
-                string email = "";
+                var user = _user.GetUserDetails();
                 string department = "HR";
-                string role = "employee";
 
                 //create submitter record
-                var submitter = new Submitter(userId, name, email, role, department);
+                var submitter = new Submitter(user.UserId, user.Name, user.Email, user.Role, department);
+
+                if((request.RequisitionType is RequisitionType.CashAdvance or RequisitionType.Grant) && request.BankAccount is null)
+                {
+                    throw new ApplicationException($"Bank account details not provided.", ExceptionCodes.BankDetailsNotProvided.ToString(), 400);
+                }
 
                 //creating the requisition object
                 var requisition = new Requisition(
@@ -99,7 +102,7 @@ namespace Application.Commands
                 }
 
                 //create approval flow for the requisition
-                var approvalFlow = _approvalFlowService.CreateApprovalFlow(requisition, role);
+                var approvalFlow = _approvalFlowService.CreateApprovalFlow(requisition, user.Role);
 
                 //set the flow for the requisition
                 requisition.SetApprovalFlow(approvalFlow);

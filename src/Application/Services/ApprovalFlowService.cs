@@ -1,5 +1,4 @@
 ﻿using Application.Configurations;
-using Domain.Constants;
 using Domain.Entities.Aggregates.RequisitionAggregate;
 using Microsoft.Extensions.Options;
 
@@ -22,11 +21,15 @@ namespace Application.Services
 
             //read the approval flow config from settings
             var approvalSteps = new List<string>(_approvalFlowConfig.Value.Steps);
+            int order = 0;
 
-            if (submitterRole == Roles.HOD)
+            // Find the index of the startAfterRole
+            int startIndex = approvalSteps.IndexOf(submitterRole);
+
+            // If the submitterRole is found, remove steps up to and including this role
+            if (startIndex >= 0)
             {
-                // Remove the first approver if the submitter is HOD
-                approvalSteps.RemoveAt(0);
+                approvalSteps.RemoveRange(0, startIndex + 1);
             }
 
             var approvalFlow = new ApprovalFlow(requisition.RequisitionId, approvers);
@@ -34,7 +37,8 @@ namespace Application.Services
             foreach (var role in approvalSteps)
             {
                 var approverId = GetRoleUserId(role); // Method to get user ID for the role
-                approvers.AddLast(new ApprovalStep(approvalFlow.ApprovalFlowId, approverId, [role]));
+                approvers.AddLast(new ApprovalStep(approvalFlow.ApprovalFlowId, approverId, role, order));
+                order++;
             }
 
             return approvalFlow;

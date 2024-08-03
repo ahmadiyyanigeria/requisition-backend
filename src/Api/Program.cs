@@ -2,7 +2,6 @@ using Api.Extensions;
 using Application.Commands;
 using Application.Configurations;
 using Infrastructure.Extensions;
-using Microsoft.Extensions.Configuration;
 using Prometheus;
 using Serilog;
 
@@ -31,6 +30,18 @@ builder.Services.AddHealthChecks();
 builder.Services.AddMapster();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(typeof(CreateRequisition).Assembly));
 builder.Services.AddValidators();
+
+// Configure Authentication
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddMockAuth();
+}
+else
+{
+    builder.Services.AddAuth();
+}
+builder.Services.AddAuthorization();
+
 
 var app = builder.Build();
 app.ConfigureExceptionHandler();
