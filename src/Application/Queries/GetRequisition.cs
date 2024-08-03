@@ -20,9 +20,9 @@ namespace Application.Queries
             private readonly IRequisitionRepository _requisitionRepository;
             private readonly ILogger<Handler> _logger;
 
-            public Handler(IRequisitionRepository requisistionRepository, ILogger<Handler> logger)
+            public Handler(IRequisitionRepository requisitionRepository, ILogger<Handler> logger)
             {
-                _requisitionRepository = requisistionRepository;
+                _requisitionRepository = requisitionRepository;
                 _logger = logger;
             }
             public async Task<RequisitionResponse> Handle(Query request, CancellationToken cancellationToken)
@@ -38,7 +38,7 @@ namespace Application.Queries
                 .Select(step => new Approval(step.Role, step.Status.ToString())).ToList();
 
                 var submitterName = requisition.Submitter.Name;
-                var items = requisition.Items.Select(a => new Item(a.Description, a.Quantity, a.TotalPrice)).ToList();
+                var items = requisition.Items.Select(a => new Item(a.Description, a.UnitPrice, a.Quantity, a.TotalPrice)).ToList();
 
                 var requisitionResponse = new RequisitionResponse(requisition.RequisitionId, submitterName, requisition.Description, requisition.ExpenseHead, requisition.Status, requisition.RequestedDate, requisition.ApprovedDate, requisition.RejectedDate, requisition.LastDateModified, requisition.TotalAmount, approvalList, requisition.RequisitionType, requisition.Department, items, requisition.Attachments);
 
@@ -49,6 +49,6 @@ namespace Application.Queries
 
         public record Approval(string Role, string Status);
 
-        public record Item(string Description, int Quantity, decimal TotalPrice);
+        public record Item(string Description, decimal UnitPrice, int Quantity, decimal TotalPrice);
     }
 }
