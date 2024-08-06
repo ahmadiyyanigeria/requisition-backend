@@ -15,11 +15,14 @@
             ApproverSteps = approverSteps;
         }
 
-        public void MoveToNextStep()
+        public void MoveToNextStep(string approverId)
         {
+            var currentApprover = GetApprover(approverId);
+            var currentApproverOrder = currentApprover.Order;
+            currentApproverOrder++;
             if (CurrentStep < ApproverSteps.Count - 1)
             {
-                CurrentStep++;
+                CurrentStep = currentApproverOrder;
             }
         }
 
@@ -28,8 +31,26 @@
             return ApproverSteps.ElementAt(CurrentStep);
         }
 
-        public bool IsFinalStep()
+        public ApprovalStep? GetApprover(string approverId)
         {
+            return ApproverSteps.FirstOrDefault(a => a.ApproverId == approverId);
+        }
+
+        public bool CanApprove(string approverId)
+        {
+            var currentApprover = GetApprover(approverId);
+            var currentApproverOrder = currentApprover.Order;
+
+            // Check if the approver has a higher order than the current step
+            var approver = ApproverSteps.FirstOrDefault(a => a.ApproverId == approverId);
+            return approver != null && approver.Order >= currentApproverOrder;
+        }
+
+        public bool IsFinalStep(string approverId)
+        {
+            var currentApprover = GetApprover(approverId);
+            var currentApproverOrder = currentApprover.Order;
+            CurrentStep = currentApproverOrder;
             return CurrentStep >= ApproverSteps.Count - 1;
         }
     }
