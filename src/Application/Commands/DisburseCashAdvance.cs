@@ -57,11 +57,14 @@ namespace Application.Commands
                 {
                     throw new ApplicationException($"Cash Advance already retired.", ExceptionCodes.CashAdvanceRetired.ToString(), 400);
                 }
-               
+                if (cashAdvance.AdvanceAmount != request.Amount)
+                {
+                    throw new ApplicationException($"Amount to be disbursed not tally with amount approved.", ExceptionCodes.InvalidDisbursedAmount.ToString(), 400);
+                }
+
                 cashAdvance.Disburse();
 
                 await _cashAdvanceRepository.UpdateAsync(cashAdvance);
-                await _requisitionRepository.UpdateAsync(cashAdvance.Requisition);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
                 return cashAdvance.Adapt<CashAdvanceResponse>(); 
             }

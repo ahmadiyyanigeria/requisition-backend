@@ -24,7 +24,7 @@ namespace Infrastructure.Persistence.Repositories
 
         public async Task<CashAdvance?> GetByIdAsync(Guid cashAdvanceId)
         {
-            return await _context.CashAdvances.FirstOrDefaultAsync(ca => ca.CashAdvanceId == cashAdvanceId);
+            return await _context.CashAdvances.Include(x => x.RefundEntry).Include(x => x.RetirementEntry).Include(x => x.ReimbursementEntry).Include(x => x.Requisition).FirstOrDefaultAsync(ca => ca.CashAdvanceId == cashAdvanceId);
         }
 
         public async Task<CashAdvance> UpdateAsync(CashAdvance cashAdvance)

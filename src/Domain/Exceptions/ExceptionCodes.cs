@@ -17,6 +17,7 @@ public enum ExceptionCodes
     CashAdvanceNotDisbursed,
     CashAdvanceNotInRequestState,
     InvalidRefundAmount,
+    InvalidDisbursedAmount,
     InvalidReimbursementAmount,
     RejectNotesNull,
     PurchaseOrderNotFound

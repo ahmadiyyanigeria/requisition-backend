@@ -32,6 +32,12 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
                 .HasColumnName("amount") 
                 .HasColumnType("decimal(18,2)");
 
+            builder.Property(e => e.Status)
+                .IsRequired()
+                .HasMaxLength(20)
+                .HasColumnName("status")
+                .HasColumnType("varchar(20)");
+
             builder.Property(e => e.Date)
                 .IsRequired() 
                 .HasColumnName("date")
