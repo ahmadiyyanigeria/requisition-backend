@@ -1,6 +1,7 @@
 ﻿using Application.Paging;
 using Application.Repositories;
 using Domain.Entities.Aggregates.GrantAggregate;
+using Domain.Entities.Aggregates.RequisitionAggregate;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Repositories
@@ -23,6 +24,12 @@ namespace Infrastructure.Persistence.Repositories
         public async Task<Grant?> GetByIdAsync(Guid grantId)
         {
             return await _context.Grants.FirstOrDefaultAsync(g => g.GrantId == grantId);
+        }
+
+        public async Task<Grant> UpdateAsync(Grant grant)
+        {
+            _context.Grants.Update(grant);
+            return grant;
         }
 
         public async Task<PaginatedList<Grant>> GetGrants(PageRequest pageRequest, bool usePaging = true)

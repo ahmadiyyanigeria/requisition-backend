@@ -8,6 +8,7 @@ namespace Application.Repositories
     {
         Task<PurchaseOrder> AddAsync(PurchaseOrder purchaseOrder);
         Task<PurchaseOrder?> GetByIdAsync(Guid purchaseOrderId);
+        Task<PurchaseOrder> UpdateAsync(PurchaseOrder purchaseOrder);
         Task<PaginatedList<PurchaseOrder>> GetPurchaseOrders(PageRequest pageRequest, bool usePaging = true, DateTime? orderStartDate = null, DateTime? orderEndDate = null, DateTime? deliveryStartDate = null, DateTime? deliveryEndDate = null, decimal? minTotalAmount = null, decimal? maxTotalAmount = null, PurchaseOrderStatus? status = null, Guid? vendorId = null);
     }
 }

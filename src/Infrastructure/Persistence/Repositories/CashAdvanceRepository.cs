@@ -1,6 +1,7 @@
 ﻿using Application.Paging;
 using Application.Repositories;
 using Domain.Entities.Aggregates.CashAdvanceAggregate;
+using Domain.Entities.Aggregates.RequisitionAggregate;
 using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,6 +25,12 @@ namespace Infrastructure.Persistence.Repositories
         public async Task<CashAdvance?> GetByIdAsync(Guid cashAdvanceId)
         {
             return await _context.CashAdvances.FirstOrDefaultAsync(ca => ca.CashAdvanceId == cashAdvanceId);
+        }
+
+        public async Task<CashAdvance> UpdateAsync(CashAdvance cashAdvance)
+        {
+            _context.CashAdvances.Update(cashAdvance);
+            return cashAdvance;
         }
 
         public async Task<PaginatedList<CashAdvance>> GetCashAdvances(PageRequest pageRequest, bool usePaging = true, DateTime? requestedStartDate = null, DateTime? requestedEndDate = null, DateTime? disbursedStartDate = null, DateTime? disbursedEndDate = null, DateTime? retiredStartDate = null, DateTime? retiredEndDate = null, CashAdvanceStatus? status = null, decimal? minAdvanceAmount = null, decimal? maxAdvanceAmount = null)

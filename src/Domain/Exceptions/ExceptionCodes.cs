@@ -11,6 +11,13 @@ public enum ExceptionCodes
     RequisitionNotFound,
     BankDetailsNotProvided,
     CashAdvanceNotFound,
+    CashAdvanceReimbursementNotFound,
+    CashAdvanceRetired,
+    CashAdvanceReimbursementPaid,
+    CashAdvanceNotDisbursed,
+    CashAdvanceNotInRequestState,
+    InvalidRefundAmount,
+    InvalidReimbursementAmount,
     RejectNotesNull,
     PurchaseOrderNotFound
 }

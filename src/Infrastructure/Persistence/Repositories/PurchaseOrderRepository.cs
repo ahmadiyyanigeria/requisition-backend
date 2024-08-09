@@ -21,6 +21,12 @@ namespace Infrastructure.Persistence.Repositories
             return purchaseOrder;
         }
 
+        public async Task<PurchaseOrder> UpdateAsync(PurchaseOrder purchaseOrder)
+        {
+            _context.PurchaseOrders.Update(purchaseOrder);
+            return purchaseOrder;
+        }
+
         public async Task<PaginatedList<PurchaseOrder>> GetPurchaseOrders(PageRequest pageRequest, bool usePaging = true, DateTime? orderStartDate = null, DateTime? orderEndDate = null, DateTime? deliveryStartDate = null, DateTime? deliveryEndDate = null,decimal? minTotalAmount = null, decimal? maxTotalAmount = null, PurchaseOrderStatus? status = null, Guid? vendorId = null)
         {
             var query = _context.PurchaseOrders.Include(x => x.Items).Include(x => x.Vendor).AsQueryable();

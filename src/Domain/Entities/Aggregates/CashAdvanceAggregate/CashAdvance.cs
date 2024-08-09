@@ -1,4 +1,5 @@
-﻿using Domain.Entities.ValueObjects;
+﻿using Domain.Entities.Aggregates.RequisitionAggregate;
+using Domain.Entities.ValueObjects;
 using Domain.Enums;
 using Domain.Exceptions;
 
@@ -8,6 +9,7 @@ namespace Domain.Entities.Aggregates.CashAdvanceAggregate
     {
         public Guid CashAdvanceId { get; private set; }
         public Guid RequisitionId { get; private set; }
+        public Requisition Requisition { get; private set; } = default!;
         public Guid ProcessorId { get; private set; }
         public string Notes { get; private set; } = default!;
         public decimal AdvanceAmount { get; private set; }

@@ -7,6 +7,8 @@ namespace Application.Repositories
     {
         Task<Grant> AddAsync(Grant grant);
         Task<Grant?> GetByIdAsync(Guid grantId);
+
+        Task<Grant> UpdateAsync(Grant grant);
         Task<PaginatedList<Grant>> GetGrants(PageRequest pageRequest, bool usePaging = true);
     }
 }

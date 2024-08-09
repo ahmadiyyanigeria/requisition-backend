@@ -14,7 +14,7 @@ namespace Domain.Entities.Aggregates.CashAdvanceAggregate
         public string Type => "Expense";
 
         private RetirementEntry() { }
-        public RetirementEntry(Guid cashAdvanceId, string description, decimal amount, Guid receipt)
+        public RetirementEntry(Guid cashAdvanceId, string description, decimal amount)
         {
             RetirementEntryId = Guid.NewGuid();
             CashAdvanceId = cashAdvanceId;
