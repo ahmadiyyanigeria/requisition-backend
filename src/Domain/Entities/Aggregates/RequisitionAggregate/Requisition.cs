@@ -45,7 +45,7 @@ namespace Domain.Entities.Aggregates.RequisitionAggregate
 
         public void AddItem(RequisitionItem item)
         {
-            if (item == null)
+            if (item == null || item.TotalPrice == 0)
             {
                 throw new DomainException("Requisition item cannot be null");
             }
@@ -121,16 +121,13 @@ namespace Domain.Entities.Aggregates.RequisitionAggregate
         public void ApproveCurrentStep(string approverId, string? notes)
         {
             ValidateCurrentState();
-
-            //var currentApprover = GetCurrentApprover(approverId);
             var approver = GetApprover(approverId);
 
             if (ApprovalFlow.CanApprove(approverId))
             {
-                // Approve if the approver has the same or higher order
                 approver.Approve(notes);
 
-                if (ApprovalFlow.IsFinalStep(approverId))
+                if (ApprovalFlow.IsFinalApproval(approverId))
                 {
                     Status = RequisitionStatus.Approved;
                     ApprovedDate = DateTime.UtcNow;
@@ -152,7 +149,7 @@ namespace Domain.Entities.Aggregates.RequisitionAggregate
         {
             ValidateCurrentState();
 
-            var currentApprover = GetCurrentApprover(approverId);
+            var currentApprover = GetApprover(approverId);
 
             if (ApprovalFlow.CanApprove(approverId))
             {
@@ -184,16 +181,6 @@ namespace Domain.Entities.Aggregates.RequisitionAggregate
             {
                 throw new DomainException("Requisition is not in a pending or approval state.");
             }
-        }
-
-        private ApprovalStep GetCurrentApprover(string approverId)
-        {
-            var currentApprover = ApprovalFlow.GetCurrentApprover();
-            if (currentApprover.ApproverId != approverId)
-            {
-                throw new DomainException("You are not authorized to approve or reject this step.");
-            }
-            return currentApprover;
         }
 
         private ApprovalStep GetApprover(string approverId)

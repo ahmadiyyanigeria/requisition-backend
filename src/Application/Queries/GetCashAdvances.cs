@@ -9,10 +9,16 @@ namespace Application.Queries
 {
     public class GetCashAdvances
     {
-        public record Query : PageRequest, IRequest<PaginatedList<CashAdvanceResponse>>
-        {
-            public bool UsePaging { get; init; } = true;
-        }
+        public record Query(bool UsePaging = true,
+        DateTime? RequestedStartDate = null,
+        DateTime? RequestedEndDate = null,
+        DateTime? DisbursedStartDate = null,
+        DateTime? DisbursedEndDate = null,
+        DateTime? RetiredStartDate = null,
+        DateTime? RetiredEndDate = null,
+        CashAdvanceStatus? Status = null,
+        decimal? MinAdvanceAmount = null,
+        decimal? MaxAdvanceAmount = null) : PageRequest, IRequest<PaginatedList<CashAdvanceResponse>>;
 
         public record CashAdvanceResponse(Guid CashAdvanceId, Guid RequisitionId, Guid SubmitterId, decimal AdvanceAmount, CashAdvanceStatus Status, BankAccount BankAccount);
 
@@ -26,7 +32,7 @@ namespace Application.Queries
             }
             public async Task<PaginatedList<CashAdvanceResponse>> Handle(Query request, CancellationToken cancellationToken)
             {
-                var cashAdvances = await _cashAdvanceRepository.GetCashAdvances(request, request.UsePaging);
+                var cashAdvances = await _cashAdvanceRepository.GetCashAdvances(request, request.UsePaging, request.RequestedStartDate, request.RequestedEndDate, request.DisbursedStartDate, request.DisbursedEndDate, request.RetiredStartDate, request.RetiredEndDate,request.Status, request.MinAdvanceAmount, request.MaxAdvanceAmount);
                 return cashAdvances.Adapt<PaginatedList<CashAdvanceResponse>>();
             }
         }

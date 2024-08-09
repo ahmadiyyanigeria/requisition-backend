@@ -11,7 +11,7 @@ namespace Application.Repositories
         Task<Requisition?> GetByIdAsync(Guid requisitionId);
         Task<IReadOnlyList<Requisition>> GetAllAsync();
         Task<IReadOnlyList<Requisition>> GetAllAsync(DateTime? startDate = null, DateTime? endDate = null);
-        Task<PaginatedList<Requisition>> GetPaginatedAsync(PageRequest pageRequest, DateTime? startDate, DateTime? endDate, string? expenseHead, string? Department, HashSet<RequisitionStatus>? StatusFilter, HashSet<RequisitionType>? TypeFilter);
+        Task<PaginatedList<Requisition>> GetRequisitions(PageRequest pageRequest, bool usePaging = true, DateTime? requestedStartDate = null, DateTime? requestedEndDate = null, RequisitionStatus? status = null, decimal? minTotalAmount = null, decimal? maxTotalAmount = null, IReadOnlyList<Guid>? submitterIds = null, string? expenseHead = null, RequisitionType? requisitionType = null, string? department = null);
         Task<IReadOnlyList<Requisition>> GetRequisitionsBySubmitterAsync(Guid submitterId);
     }
 }

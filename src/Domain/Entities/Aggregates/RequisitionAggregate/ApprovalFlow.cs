@@ -1,4 +1,6 @@
-﻿namespace Domain.Entities.Aggregates.RequisitionAggregate
+﻿using Domain.Exceptions;
+
+namespace Domain.Entities.Aggregates.RequisitionAggregate
 {
     public class ApprovalFlow
     {
@@ -17,18 +19,13 @@
 
         public void MoveToNextStep(string approverId)
         {
-            var currentApprover = GetApprover(approverId);
+            var currentApprover = GetApprover(approverId) ?? throw new DomainException("Approver not found.");
             var currentApproverOrder = currentApprover.Order;
             currentApproverOrder++;
             if (CurrentStep < ApproverSteps.Count - 1)
             {
                 CurrentStep = currentApproverOrder;
             }
-        }
-
-        public ApprovalStep GetCurrentApprover()
-        {
-            return ApproverSteps.ElementAt(CurrentStep);
         }
 
         public ApprovalStep? GetApprover(string approverId)
@@ -39,18 +36,20 @@
         public bool CanApprove(string approverId)
         {
             var currentApprover = GetApprover(approverId);
-            var currentApproverOrder = currentApprover.Order;
+            if (currentApprover == null)
+                return false;
 
             // Check if the approver has a higher order than the current step
             var approver = ApproverSteps.FirstOrDefault(a => a.ApproverId == approverId);
-            return approver != null && approver.Order >= currentApproverOrder;
+            return approver != null && approver.Order >= currentApprover.Order;
         }
 
-        public bool IsFinalStep(string approverId)
+        public bool IsFinalApproval(string approverId)
         {
-            var currentApprover = GetApprover(approverId);
-            var currentApproverOrder = currentApprover.Order;
-            CurrentStep = currentApproverOrder;
+            var approver = GetApprover(approverId);
+            if (approver == null)
+                return false;
+            CurrentStep = approver.Order;
             return CurrentStep >= ApproverSteps.Count - 1;
         }
     }

@@ -1,6 +1,7 @@
 ﻿using Application.Paging;
 using Application.Repositories;
 using Domain.Entities.Aggregates.PurchaseOrderAggregate;
+using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Repositories
@@ -20,9 +21,49 @@ namespace Infrastructure.Persistence.Repositories
             return purchaseOrder;
         }
 
-        public async Task<PaginatedList<PurchaseOrder>> GetPurchaseOrders(PageRequest pageRequest, bool usePaging = true)
+        public async Task<PaginatedList<PurchaseOrder>> GetPurchaseOrders(PageRequest pageRequest, bool usePaging = true, DateTime? orderStartDate = null, DateTime? orderEndDate = null, DateTime? deliveryStartDate = null, DateTime? deliveryEndDate = null,decimal? minTotalAmount = null, decimal? maxTotalAmount = null, PurchaseOrderStatus? status = null, Guid? vendorId = null)
         {
             var query = _context.PurchaseOrders.Include(x => x.Items).Include(x => x.Vendor).AsQueryable();
+
+            if (orderStartDate.HasValue)
+            {
+                query = query.Where(x => x.OrderDate >= orderStartDate.Value);
+            }
+
+            if (orderEndDate.HasValue)
+            {
+                query = query.Where(x => x.OrderDate <= orderEndDate.Value);
+            }
+
+            if (deliveryStartDate.HasValue)
+            {
+                query = query.Where(x => x.DeliveryDate >= deliveryStartDate.Value);
+            }
+
+            if (deliveryEndDate.HasValue)
+            {
+                query = query.Where(x => x.DeliveryDate <= deliveryEndDate.Value);
+            }
+
+            if (minTotalAmount.HasValue)
+            {
+                query = query.Where(x => x.TotalAmount >= minTotalAmount.Value);
+            }
+
+            if (maxTotalAmount.HasValue)
+            {
+                query = query.Where(x => x.TotalAmount <= maxTotalAmount.Value);
+            }
+
+            if (status.HasValue)
+            {
+                query = query.Where(x => x.Status == status.Value);
+            }
+
+            if (vendorId.HasValue)
+            {
+                query = query.Where(x => x.VendorId == vendorId.Value);
+            }
 
             if (!string.IsNullOrEmpty(pageRequest?.Keyword))
             {
