@@ -17,12 +17,12 @@ namespace Domain.Entities.Aggregates.RequisitionAggregate
         {
             if (quantity <= 0)
             {
-                throw new DomainException("Quantity must be greater than zero.");
+                throw new DomainException("Item quantity must be greater than zero.");
             }
 
             if (unitPrice <= 0)
             {
-                throw new DomainException("Unit price must be greater than zero.");
+                throw new DomainException("Item unit price must be greater than zero.");
             }
 
             RequisitionId = requisitionId;

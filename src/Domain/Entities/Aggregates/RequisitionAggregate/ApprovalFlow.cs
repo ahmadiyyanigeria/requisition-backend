@@ -1,4 +1,6 @@
-﻿namespace Domain.Entities.Aggregates.RequisitionAggregate
+﻿using Domain.Exceptions;
+
+namespace Domain.Entities.Aggregates.RequisitionAggregate
 {
     public class ApprovalFlow
     {
@@ -15,21 +17,39 @@
             ApproverSteps = approverSteps;
         }
 
-        public void MoveToNextStep()
+        public void MoveToNextStep(string approverId)
         {
+            var currentApprover = GetApprover(approverId) ?? throw new DomainException("Approver not found.");
+            var currentApproverOrder = currentApprover.Order;
+            currentApproverOrder++;
             if (CurrentStep < ApproverSteps.Count - 1)
             {
-                CurrentStep++;
+                CurrentStep = currentApproverOrder;
             }
         }
 
-        public ApprovalStep GetCurrentApprover()
+        public ApprovalStep? GetApprover(string approverId)
         {
-            return ApproverSteps.ElementAt(CurrentStep);
+            return ApproverSteps.FirstOrDefault(a => a.ApproverId == approverId);
         }
 
-        public bool IsFinalStep()
+        public bool CanApprove(string approverId)
         {
+            var currentApprover = GetApprover(approverId);
+            if (currentApprover == null)
+                return false;
+
+            // Check if the approver has a higher order than the current step
+            var approver = ApproverSteps.FirstOrDefault(a => a.ApproverId == approverId);
+            return approver != null && approver.Order >= currentApprover.Order;
+        }
+
+        public bool IsFinalApproval(string approverId)
+        {
+            var approver = GetApprover(approverId);
+            if (approver == null)
+                return false;
+            CurrentStep = approver.Order;
             return CurrentStep >= ApproverSteps.Count - 1;
         }
     }

@@ -25,9 +25,9 @@ namespace Infrastructure.Persistence.Repositories
             return await _context.Submitters.FirstOrDefaultAsync(g => g.Email == email);
         }
 
-        public async Task<Submitter?> GetByUserIdAsync(string userId)
+        public async Task<IReadOnlyList<Submitter?>> GetByUserIdAsync(string userId)
         {
-            return await _context.Submitters.FirstOrDefaultAsync(g => g.UserId == userId);
+            return await _context.Submitters.Where(g => g.UserId == userId).ToListAsync();
         }
 
         public async Task<Submitter?> GetByIdAsync(Guid submitterId)
