@@ -95,7 +95,13 @@ namespace Infrastructure.Persistence.Repositories
 
         public async Task<PurchaseOrder?> GetByIdAsync(Guid purchaseOrderId)
         {
-            return await _context.PurchaseOrders.FirstOrDefaultAsync(po => po.PurchaseOrderId  == purchaseOrderId);
+            return await _context.PurchaseOrders.Include(x => x.Requisition).Include(x => x.Vendor).Include(x => x.Items).Include(x => x.Payments).FirstOrDefaultAsync(po => po.PurchaseOrderId  == purchaseOrderId);
+        }
+
+        public async Task<Payment> AddPaymentAsync(Payment payment)
+        {
+            await _context.Payments.AddAsync(payment);
+            return payment;
         }
     }
 }

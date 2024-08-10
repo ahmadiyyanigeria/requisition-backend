@@ -1,4 +1,5 @@
 ﻿using Application.Repositories;
+using Domain.Entities.Aggregates.PurchaseOrderAggregate;
 using Domain.Enums;
 using Domain.Exceptions;
 using Mapster;
@@ -34,12 +35,12 @@ namespace Application.Queries
                     _logger.LogError("Purchase order with Id {Id} does not exist", request.Id);
                     throw new ApplicationException($"Purchase with Id {request.Id} does not exists", ExceptionCodes.PurchaseOrderNotFound.ToString(), 404);
                 }
-                var purchaseOrderResponse = purchaseOrder.Adapt<PurchaseOrderResponse>();
-                return purchaseOrderResponse;
+
+                var response = new PurchaseOrderResponse(purchaseOrder.PurchaseOrderId, purchaseOrder.RequisitionId, purchaseOrder.OrderDate, purchaseOrder.TotalAmount, purchaseOrder.DeliveryDate, purchaseOrder.Status, purchaseOrder.Vendor, [.. purchaseOrder.Items], [.. purchaseOrder.Payments]);
+                return response;
 
             }
         }
-        public record PurchaseOrderResponse(Guid PurchaseOrderId, Guid RequisitionId, DateTime OrderDate, decimal TotalAmount, DateTime DeliveryDate,PurchaseOrderStatus Status);
-        
+        public record PurchaseOrderResponse(Guid PurchaseOrderId, Guid RequisitionId, DateTime OrderDate, decimal TotalAmount, DateTime? DeliveryDate,PurchaseOrderStatus Status, Vendor Vendor, List<PurchaseOrderItem> Items, List<Payment> Payments);
     }
 }

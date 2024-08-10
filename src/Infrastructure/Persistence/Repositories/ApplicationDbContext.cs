@@ -17,6 +17,7 @@ public class ApplicationDbContext : DbContext
 
     // DbSet for PurchaseOrder aggregate
     public DbSet<PurchaseOrder> PurchaseOrders { get; set; }
+    public DbSet<Payment> Payments { get; set; }
     public DbSet<PurchaseOrderItem> PurchaseOrderItems { get; set; }
     public DbSet<Vendor> Vendors { get; set; }
 

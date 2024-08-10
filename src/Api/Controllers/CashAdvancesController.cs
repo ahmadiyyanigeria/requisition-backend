@@ -58,7 +58,7 @@ namespace Api.Controllers
             return Ok(cashAdvance);
         }
 
-        [HttpPost("{id}/refund")]
+        [HttpPatch("{id}/refund")]
         public async Task<IActionResult> AddRefundEntry([FromRoute] Guid id, [FromBody] RefundCashAdvanceCommand command)
         {
             command.CashAdvanceId = id;
@@ -66,7 +66,7 @@ namespace Api.Controllers
             return Ok(cashAdvance);
         }
 
-        [HttpPost("{id}/reimbursement")]
+        [HttpPatch("{id}/reimbursement")]
         public async Task<IActionResult> AddReimbursementEntry([FromRoute] Guid id, [FromBody]ReimburseCashAdvanceCommand command)
         {
             command.CashAdvanceId = id;

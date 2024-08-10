@@ -1,7 +1,6 @@
 ﻿using Application.Paging;
 using Application.Repositories;
 using Domain.Enums;
-using Mapster;
 using MediatR;
 
 namespace Application.Queries
@@ -18,16 +17,7 @@ namespace Application.Queries
         PurchaseOrderStatus? Status = null,
         Guid? VendorId = null) : PageRequest, IRequest<PaginatedList<PurchaseOrderResponse>>;
 
-        public record PurchaseOrderResponse
-        {
-            public Guid PurchaseOrderId { get; private set; }
-            public Guid RequisitionId { get; private set; }
-            public string Vendor { get; private set; } = default!;
-            public DateTime OrderDate { get; private set; }
-            public DateTime? DeliveryDate { get; private set; }
-            public decimal TotalAmount { get; private set; }
-            public PurchaseOrderStatus Status { get; private set; }
-        }
+        public record PurchaseOrderResponse(Guid PurchaseOrderId, Guid RequisitionId, DateTime OrderDate, decimal TotalAmount, DateTime? DeliveryDate, PurchaseOrderStatus Status, string Vendor);
 
         public class Handler : IRequestHandler<Query, PaginatedList<PurchaseOrderResponse>>
         {
@@ -39,9 +29,19 @@ namespace Application.Queries
             }
             public async Task<PaginatedList<PurchaseOrderResponse>> Handle(Query request, CancellationToken cancellationToken)
             {
-                var purchaseOrders = await _purchaseOrderRepository.GetPurchaseOrders(request, request.UsePaging, request.OrderStartDate, request.OrderEndDate, request.DeliveryStartDate, request.DeliveryEndDate, request.MinTotalAmount, request.MaxTotalAmount, request.Status, request.VendorId
-            );
-                return purchaseOrders.Adapt<PaginatedList<PurchaseOrderResponse>>();
+                var purchaseOrders = await _purchaseOrderRepository.GetPurchaseOrders(request, request.UsePaging, request.OrderStartDate, request.OrderEndDate, request.DeliveryStartDate, request.DeliveryEndDate, request.MinTotalAmount, request.MaxTotalAmount, request.Status, request.VendorId);
+
+                var purchaseOrderResponses = purchaseOrders.Items.Select(po => new PurchaseOrderResponse(po.PurchaseOrderId,po.RequisitionId,po.OrderDate,po.TotalAmount,po.DeliveryDate,po.Status, po.Vendor.Name)).ToList();
+
+                var response = new PaginatedList<PurchaseOrderResponse>
+                {
+                    Items = purchaseOrderResponses,
+                    PageSize = purchaseOrders.PageSize,
+                    TotalItems = purchaseOrders.TotalItems,
+                    Page = purchaseOrders.Page
+                };
+
+                return response;
             }
         }
     }

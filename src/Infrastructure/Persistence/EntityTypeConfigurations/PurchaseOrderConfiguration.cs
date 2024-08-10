@@ -75,6 +75,11 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
                 .HasForeignKey(item => item.PurchaseOrderId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasMany(e => e.Payments)
+                .WithOne()
+                .HasForeignKey(item => item.PurchaseOrderId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

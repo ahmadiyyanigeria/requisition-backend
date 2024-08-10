@@ -2,6 +2,9 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using static Application.Commands.CreatePurchaseOrder;
+using static Application.Commands.DisburseCashAdvance;
+using static Application.Commands.FulfilPurchaseOrder;
+using static Application.Commands.PayPurchaseOrder;
 
 namespace Api.Controllers
 {
@@ -35,6 +38,22 @@ namespace Api.Controllers
         {
             var purchaseOrders = await _mediator.Send(query);
             return Ok(purchaseOrders);
+        }
+
+        [HttpPatch("{id}/fulfill")]
+        public async Task<IActionResult> FulfillPurchaseOrder([FromRoute] Guid id, [FromBody] FulfilPurchaseOrderCommand command)
+        {
+            command.PurchaseOrderId = id;
+            var purchaseOrder = await _mediator.Send(command);
+            return Ok(purchaseOrder);
+        }
+
+        [HttpPatch("{id}/pay")]
+        public async Task<IActionResult> PayPurchaseOrder([FromRoute] Guid id, [FromBody] PayPurchaseOrderCommand command)
+        {
+            command.PurchaseOrderId = id;
+            var purchaseOrder = await _mediator.Send(command);
+            return Ok(purchaseOrder);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Domain.Entities.Common;
+﻿using Domain.Entities.Aggregates.RequisitionAggregate;
 using Domain.Enums;
 using Domain.Exceptions;
 
@@ -8,6 +8,7 @@ namespace Domain.Entities.Aggregates.PurchaseOrderAggregate
     {
         public Guid PurchaseOrderId { get; private set; }
         public Guid RequisitionId { get; private set; }
+        public Requisition Requisition { get; private set; } = default!;
         public Guid ProcessorId { get; private set; }
         public string Notes { get; private set; } = default!;
         public Guid VendorId { get; private set; }
@@ -56,9 +57,10 @@ namespace Domain.Entities.Aggregates.PurchaseOrderAggregate
         public void AddPayment(Payment payment)
         {
             _payments.Add(payment);
-            if (_payments.Sum(p => p.Amount) >= TotalAmount)
+            if (_payments.Sum(p => p.Amount) == TotalAmount)
             {
                 Status = PurchaseOrderStatus.Paid;
+                Requisition.SetRequisitionClosed();
             }
         }
 
