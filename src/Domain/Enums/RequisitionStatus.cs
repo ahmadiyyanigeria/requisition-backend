@@ -25,6 +25,8 @@ namespace Domain.Enums
         [Description("CA Generated")]
         CAGenerated,
         [Description("Voided")]
-        Voided
+        Voided,
+        [Description("Cancelled")]
+        Cancelled
     }
 }

@@ -204,5 +204,9 @@ namespace Domain.Entities.Aggregates.RequisitionAggregate
                 _attachments.Remove(attachment);
             }
         }
+        public void SetRequisitionCanceled()
+        {
+            Status = RequisitionStatus.Cancelled;
+        }
     }
 }
