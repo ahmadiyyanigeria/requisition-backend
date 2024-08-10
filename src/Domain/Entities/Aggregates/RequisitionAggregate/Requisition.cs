@@ -45,7 +45,7 @@ namespace Domain.Entities.Aggregates.RequisitionAggregate
 
         public void AddItem(RequisitionItem item)
         {
-            if (item == null)
+            if (item == null || item.TotalPrice == 0)
             {
                 throw new DomainException("Requisition item cannot be null");
             }
@@ -78,63 +78,117 @@ namespace Domain.Entities.Aggregates.RequisitionAggregate
             Status = RequisitionStatus.Pending;
         }
 
+        public void SetRequisitionClosed()
+        {
+            Status = RequisitionStatus.Closed;
+        }
+
+        public void SetRequisitionProcessed(RequisitionType type)
+        {
+            if (IsAlreadyProcessed(Status))
+            {
+                throw new DomainException("Requisition already processed.");
+            }
+
+            if (Status == RequisitionStatus.Closed)
+            {
+                throw new DomainException("Requisition already closed.");
+            }
+
+            if (Status != RequisitionStatus.Approved)
+            {
+                throw new DomainException("Requisition must be approved before processing.");
+            }
+
+            Status = type switch
+            {
+                RequisitionType.CashAdvance => RequisitionStatus.CAGenerated,
+                RequisitionType.Grant => RequisitionStatus.GrantGenerated,
+                RequisitionType.PurchaseOrder => RequisitionStatus.POGenerated,
+                _ => throw new DomainException("Invalid requisition type.", nameof(type))
+            };
+
+            LastDateModified = DateTime.UtcNow;
+        }
+
+        private bool IsAlreadyProcessed(RequisitionStatus status)
+        {
+            return status == RequisitionStatus.CAGenerated ||
+                   status == RequisitionStatus.POGenerated ||
+                   status == RequisitionStatus.GrantGenerated;
+        }
+
         public void ApproveCurrentStep(string approverId, string? notes)
         {
-            if (Status == RequisitionStatus.Pending || Status == RequisitionStatus.InProgress)
+            ValidateCurrentState();
+            var approver = GetApprover(approverId);
+
+            if (ApprovalFlow.CanApprove(approverId))
             {
-                var currentApprover = ApprovalFlow.GetCurrentApprover();
-                if (currentApprover.ApproverId == approverId)
+                approver.Approve(notes);
+
+                if (ApprovalFlow.IsFinalApproval(approverId))
                 {
-                    currentApprover.Approve(notes);
-                    if (ApprovalFlow.IsFinalStep())
-                    {
-                        Status = RequisitionStatus.Approved;
-                        ApprovedDate = DateTime.UtcNow;
-                        LastDateModified = DateTime.UtcNow;
-                    }
-                    else
-                    {
-                        ApprovalFlow.MoveToNextStep();
-                        LastDateModified = DateTime.UtcNow;
-                    }
+                    Status = RequisitionStatus.Approved;
+                    ApprovedDate = DateTime.UtcNow;
                 }
                 else
                 {
-                    throw new DomainException($"You are not authorized to approve this step.");
+                    ApprovalFlow.MoveToNextStep(approverId);
                 }
             }
             else
             {
-                throw new DomainException($"Requisition is not in pending or progress state.");
+                throw new DomainException("You are not authorized to approve or reject this step.");
             }
+
+            LastDateModified = DateTime.UtcNow;
         }
 
         public void RejectCurrentStep(string approverId, string notes)
         {
-            if (Status == RequisitionStatus.Pending || Status == RequisitionStatus.InProgress)
-            {
-                var currentApprover = ApprovalFlow.GetCurrentApprover();
-                if (currentApprover.ApproverId == approverId)
-                {
-                    if (string.IsNullOrEmpty(notes))
-                    {
-                        throw new DomainException($"Notes cannot be null or empty when rejecting a requisition.");
-                    }
+            ValidateCurrentState();
 
-                    currentApprover.Reject(notes);
-                    Status = RequisitionStatus.Rejected;
-                    RejectedDate = DateTime.UtcNow;
-                    LastDateModified = DateTime.UtcNow;
-                }
-                else
+            var currentApprover = GetApprover(approverId);
+
+            if (ApprovalFlow.CanApprove(approverId))
+            {
+                if (string.IsNullOrEmpty(notes))
                 {
-                    throw new DomainException($"You are not authorized to approve this step.");
+                    throw new DomainException("Notes cannot be null or empty when rejecting a requisition.");
                 }
+
+                currentApprover.Reject(notes);
+                Status = RequisitionStatus.Rejected;
+                RejectedDate = DateTime.UtcNow;
             }
             else
             {
-                throw new DomainException($"Requisition is not in pending or progress state.");
+                throw new DomainException("You are not authorized to approve or reject this step.");
             }
+
+            LastDateModified = DateTime.UtcNow;
+        }
+
+        private void ValidateCurrentState()
+        {
+            if (Status == RequisitionStatus.Approved )
+            {
+                throw new DomainException("Requisition is already approved.");
+            }
+
+            if (Status != RequisitionStatus.Pending && Status != RequisitionStatus.InApproval)
+            {
+                throw new DomainException("Requisition is not in a pending or approval state.");
+            }
+        }
+
+        private ApprovalStep GetApprover(string approverId)
+        {
+            var currentApprover = ApprovalFlow.GetApprover(approverId);
+            return currentApprover is null
+                ? throw new DomainException("You are not authorized to approve or reject this step.")
+                : currentApprover;
         }
 
         public void AddAttachment(Attachment attachment)
@@ -149,17 +203,6 @@ namespace Domain.Entities.Aggregates.RequisitionAggregate
             {
                 _attachments.Remove(attachment);
             }
-        }
-
-        public void SetRequisitionToProcessed()
-        {
-            if (Status != RequisitionStatus.Approved)
-            {
-                throw new DomainException("Requisition must be approved before processing.");
-            }
-
-            Status = RequisitionStatus.Processed;
-            LastDateModified = DateTime.UtcNow;
         }
     }
 }

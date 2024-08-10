@@ -37,6 +37,16 @@ namespace Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("disbursed_date");
 
+                    b.Property<string>("Notes")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("notes")
+                        .UseCollation("case_insensitive");
+
+                    b.Property<Guid>("ProcessorId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("processor_id");
+
                     b.Property<DateTime>("RequestedDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("requested_date");
@@ -55,11 +65,9 @@ namespace Infrastructure.Migrations
                         .HasColumnType("varchar(20)")
                         .HasColumnName("status");
 
-                    b.Property<Guid>("SubmitterId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("submitter_id");
-
                     b.HasKey("CashAdvanceId");
+
+                    b.HasIndex("RequisitionId");
 
                     b.ToTable("cash_advances", (string)null);
                 });
@@ -82,6 +90,12 @@ namespace Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("date");
 
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("status");
+
                     b.HasKey("RefundEntryId");
 
                     b.HasIndex("CashAdvanceId")
@@ -100,10 +114,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("amount");
 
-                    b.Property<Guid>("AttachmentId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("attachment_id");
-
                     b.Property<Guid>("CashAdvanceId")
                         .HasColumnType("uuid")
                         .HasColumnName("cash_advance_id");
@@ -118,9 +128,13 @@ namespace Infrastructure.Migrations
                         .HasColumnName("description")
                         .UseCollation("case_insensitive");
 
-                    b.HasKey("ReimbursementEntryId");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("status");
 
-                    b.HasIndex("AttachmentId");
+                    b.HasKey("ReimbursementEntryId");
 
                     b.HasIndex("CashAdvanceId")
                         .IsUnique();
@@ -138,10 +152,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("amount");
 
-                    b.Property<Guid>("AttachmentId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("attachment_id");
-
                     b.Property<Guid>("CashAdvanceId")
                         .HasColumnType("uuid")
                         .HasColumnName("cash_advance_id");
@@ -158,8 +168,6 @@ namespace Infrastructure.Migrations
                         .UseCollation("case_insensitive");
 
                     b.HasKey("RetirementEntryId");
-
-                    b.HasIndex("AttachmentId");
 
                     b.HasIndex("CashAdvanceId")
                         .IsUnique();
@@ -182,6 +190,16 @@ namespace Infrastructure.Migrations
                         .HasColumnType("decimal(18, 2)")
                         .HasColumnName("grant_amount");
 
+                    b.Property<string>("Notes")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("notes")
+                        .UseCollation("case_insensitive");
+
+                    b.Property<Guid>("ProcessorId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("processor_id");
+
                     b.Property<DateTime>("RequestedDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("requested_date");
@@ -195,10 +213,6 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("varchar(20)")
                         .HasColumnName("status");
-
-                    b.Property<Guid>("SubmitterId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("submitter_id");
 
                     b.HasKey("GrantId");
 
@@ -232,7 +246,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("PurchaseOrderId");
 
-                    b.ToTable("Payment");
+                    b.ToTable("Payments");
                 });
 
             modelBuilder.Entity("Domain.Entities.Aggregates.PurchaseOrderAggregate.PurchaseOrder", b =>
@@ -242,17 +256,23 @@ namespace Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("purchase_order_id");
 
-                    b.Property<Guid>("AttachmentId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("attachment_id");
-
                     b.Property<DateTime?>("DeliveryDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("delivery_date");
 
+                    b.Property<string>("Notes")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("notes")
+                        .UseCollation("case_insensitive");
+
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("order_date");
+
+                    b.Property<Guid>("ProcessorId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("processor_id");
 
                     b.Property<Guid>("RequisitionId")
                         .HasColumnType("uuid")
@@ -264,10 +284,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("varchar(20)")
                         .HasColumnName("status");
 
-                    b.Property<Guid>("SubmitterId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("submitter_id");
-
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("total_amount");
@@ -278,7 +294,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("PurchaseOrderId");
 
-                    b.HasIndex("AttachmentId");
+                    b.HasIndex("RequisitionId");
 
                     b.HasIndex("VendorId");
 
@@ -629,6 +645,12 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Aggregates.CashAdvanceAggregate.CashAdvance", b =>
                 {
+                    b.HasOne("Domain.Entities.Aggregates.RequisitionAggregate.Requisition", "Requisition")
+                        .WithMany()
+                        .HasForeignKey("RequisitionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.OwnsOne("Domain.Entities.ValueObjects.BankAccount", "BankAccount", b1 =>
                         {
                             b1.Property<Guid>("CashAdvanceId")
@@ -674,6 +696,8 @@ namespace Infrastructure.Migrations
 
                     b.Navigation("BankAccount")
                         .IsRequired();
+
+                    b.Navigation("Requisition");
                 });
 
             modelBuilder.Entity("Domain.Entities.Aggregates.CashAdvanceAggregate.RefundEntry", b =>
@@ -727,42 +751,25 @@ namespace Infrastructure.Migrations
                                 .HasForeignKey("RefundEntryId");
                         });
 
-                    b.Navigation("BankAccount")
-                        .IsRequired();
+                    b.Navigation("BankAccount");
                 });
 
             modelBuilder.Entity("Domain.Entities.Aggregates.CashAdvanceAggregate.ReimbursementEntry", b =>
                 {
-                    b.HasOne("Domain.Entities.Common.Attachment", "Receipt")
-                        .WithMany()
-                        .HasForeignKey("AttachmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Domain.Entities.Aggregates.CashAdvanceAggregate.CashAdvance", null)
                         .WithOne("ReimbursementEntry")
                         .HasForeignKey("Domain.Entities.Aggregates.CashAdvanceAggregate.ReimbursementEntry", "CashAdvanceId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("Receipt");
                 });
 
             modelBuilder.Entity("Domain.Entities.Aggregates.CashAdvanceAggregate.RetirementEntry", b =>
                 {
-                    b.HasOne("Domain.Entities.Common.Attachment", "Receipt")
-                        .WithMany()
-                        .HasForeignKey("AttachmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Domain.Entities.Aggregates.CashAdvanceAggregate.CashAdvance", null)
                         .WithOne("RetirementEntry")
                         .HasForeignKey("Domain.Entities.Aggregates.CashAdvanceAggregate.RetirementEntry", "CashAdvanceId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("Receipt");
                 });
 
             modelBuilder.Entity("Domain.Entities.Aggregates.GrantAggregate.Grant", b =>
@@ -819,15 +826,15 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.Aggregates.PurchaseOrderAggregate.PurchaseOrder", null)
                         .WithMany("Payments")
                         .HasForeignKey("PurchaseOrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
             modelBuilder.Entity("Domain.Entities.Aggregates.PurchaseOrderAggregate.PurchaseOrder", b =>
                 {
-                    b.HasOne("Domain.Entities.Common.Attachment", "Invoice")
+                    b.HasOne("Domain.Entities.Aggregates.RequisitionAggregate.Requisition", "Requisition")
                         .WithMany()
-                        .HasForeignKey("AttachmentId")
+                        .HasForeignKey("RequisitionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -838,7 +845,7 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_vendor_id");
 
-                    b.Navigation("Invoice");
+                    b.Navigation("Requisition");
 
                     b.Navigation("Vendor");
                 });

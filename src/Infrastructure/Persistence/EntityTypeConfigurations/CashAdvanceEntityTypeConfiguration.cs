@@ -29,10 +29,15 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
                 .HasColumnType("uuid");
 
 
-            builder.Property(e => e.SubmitterId)
+            builder.Property(e => e.ProcessorId)
                 .IsRequired()
-                .HasColumnName("submitter_id")
+                .HasColumnName("processor_id")
                 .HasColumnType("uuid");
+
+            builder.Property(e => e.Notes)
+            .IsRequired()
+            .HasColumnName("notes")
+            .HasColumnType("text");
 
             builder.Property(e => e.AdvanceAmount)
                 .IsRequired()

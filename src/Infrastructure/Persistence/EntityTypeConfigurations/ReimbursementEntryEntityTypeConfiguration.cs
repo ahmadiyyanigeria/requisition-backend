@@ -32,15 +32,21 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
                 .IsRequired()
                 .HasColumnName("amount");
 
+            builder.Property(e => e.Status)
+                .IsRequired()
+                .HasMaxLength(20)
+                .HasColumnName("status")
+                .HasColumnType("varchar(20)");
+
             builder.Property(e => e.Date)
                 .IsRequired()
                 .HasColumnName("date")
                 .HasColumnType("timestamp with time zone");
 
-            builder.Property(e => e.AttachmentId)
+            /*builder.Property(e => e.AttachmentId)
                 .IsRequired()
                 .HasColumnName("attachment_id")
-                .HasColumnType("uuid");
+                .HasColumnType("uuid");*/
         }
     }
 }

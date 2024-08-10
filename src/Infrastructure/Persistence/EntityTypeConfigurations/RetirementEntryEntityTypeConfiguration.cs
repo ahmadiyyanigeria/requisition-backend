@@ -38,10 +38,10 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
                 .HasColumnName("date")
                 .HasColumnType("timestamp with time zone");
 
-            builder.Property(e => e.AttachmentId)
+            /*builder.Property(e => e.AttachmentId)
              .IsRequired()
              .HasColumnName("attachment_id")
-             .HasColumnType("uuid");
+             .HasColumnType("uuid");*/
         }
     }
 }

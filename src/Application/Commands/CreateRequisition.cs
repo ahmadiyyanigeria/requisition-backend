@@ -7,9 +7,11 @@ using Domain.Entities.Aggregates.SubmitterAggregate;
 using Domain.Entities.Common;
 using Domain.Entities.ValueObjects;
 using Domain.Enums;
+using Domain.Exceptions;
 using FluentValidation;
 using MediatR;
 using static Application.Commands.CreateRequisition;
+using ApplicationException = Application.Exceptions.ApplicationException;
 
 namespace Application.Commands
 {
@@ -64,6 +66,11 @@ namespace Application.Commands
 
                 //create submitter record
                 var submitter = new Submitter(user.UserId, user.Name, user.Email, user.Role, department);
+
+                if((request.RequisitionType is RequisitionType.CashAdvance or RequisitionType.Grant) && request.BankAccount is null)
+                {
+                    throw new ApplicationException($"Bank account details not provided.", ExceptionCodes.BankDetailsNotProvided.ToString(), 400);
+                }
 
                 //creating the requisition object
                 var requisition = new Requisition(

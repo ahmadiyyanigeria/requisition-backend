@@ -1,4 +1,4 @@
-﻿using Domain.Entities.Common;
+﻿using Domain.Entities.Aggregates.RequisitionAggregate;
 using Domain.Enums;
 using Domain.Exceptions;
 
@@ -8,15 +8,17 @@ namespace Domain.Entities.Aggregates.PurchaseOrderAggregate
     {
         public Guid PurchaseOrderId { get; private set; }
         public Guid RequisitionId { get; private set; }
-        public Guid SubmitterId { get; private set; }
+        public Requisition Requisition { get; private set; } = default!;
+        public Guid ProcessorId { get; private set; }
+        public string Notes { get; private set; } = default!;
         public Guid VendorId { get; private set; }
         public Vendor Vendor { get; private set; } = default!;
-        public DateTime OrderDate { get; private set; } = DateTime.Now;
+        public DateTime OrderDate { get; private set; } = DateTime.UtcNow;
         public DateTime? DeliveryDate { get; private set; }
         public decimal TotalAmount { get; private set; }
         public PurchaseOrderStatus Status { get; private set; } = PurchaseOrderStatus.Requested;
-        public Guid AttachmentId { get; private set; }
-        public Attachment Invoice { get; private set; } = default!;
+        //public Guid AttachmentId { get; private set; }
+        //public Attachment Invoice { get; private set; } = default!;
 
         private readonly List<PurchaseOrderItem> _items = [];
         private readonly List<Payment> _payments = [];
@@ -24,12 +26,13 @@ namespace Domain.Entities.Aggregates.PurchaseOrderAggregate
         public IReadOnlyList<Payment> Payments => _payments.AsReadOnly();
 
         private PurchaseOrder() { }
-        public PurchaseOrder(Guid requisitionId, Guid vendorId, Guid submitterId)
+        public PurchaseOrder(Guid requisitionId, Guid vendorId, Guid processorId, string note)
         {
             PurchaseOrderId = Guid.NewGuid();
             RequisitionId = requisitionId;
             VendorId = vendorId;
-            SubmitterId = submitterId;
+            ProcessorId = processorId;
+            Notes = note;
         }
 
         public void Fulfill()
@@ -54,9 +57,10 @@ namespace Domain.Entities.Aggregates.PurchaseOrderAggregate
         public void AddPayment(Payment payment)
         {
             _payments.Add(payment);
-            if (_payments.Sum(p => p.Amount) >= TotalAmount)
+            if (_payments.Sum(p => p.Amount) == TotalAmount)
             {
                 Status = PurchaseOrderStatus.Paid;
+                Requisition.SetRequisitionClosed();
             }
         }
 

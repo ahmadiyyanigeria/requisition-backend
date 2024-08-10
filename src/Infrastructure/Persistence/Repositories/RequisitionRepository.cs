@@ -1,5 +1,6 @@
 ﻿using Application.Paging;
 using Application.Repositories;
+using Domain.Entities.Aggregates.CashAdvanceAggregate;
 using Domain.Entities.Aggregates.RequisitionAggregate;
 using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -54,58 +55,70 @@ namespace Infrastructure.Persistence.Repositories
             return await query.ToListAsync();
         }
 
-        public async Task<PaginatedList<Requisition>> GetPaginatedAsync(PageRequest pageRequest, DateTime? startDate, DateTime? endDate, string? expenseHead, string? department, HashSet<RequisitionStatus>? statusFilter, HashSet<RequisitionType>? typeFilter)
+        public async Task<PaginatedList<Requisition>> GetRequisitions(PageRequest pageRequest, bool usePaging = true, DateTime? requestedStartDate = null, DateTime? requestedEndDate = null, RequisitionStatus? status = null, decimal? minTotalAmount = null, decimal? maxTotalAmount = null, IReadOnlyList<Guid>? submitterIds = null, string? expenseHead = null, RequisitionType? requisitionType = null, string? department = null)
         {
-            var keyword = pageRequest?.Keyword?.ToLower();
-            var rawSql = @"
-                            SELECT * FROM requisitions
-                            WHERE 
-                                (@keyword IS NULL OR LOWER(Department) LIKE '%' || @keyword || '%' 
-                                OR LOWER(Expense_Head) LIKE '%' || @keyword || '%'
-                                OR LOWER(Description) LIKE '%' || @keyword || '%')
-                                AND (@department IS NULL OR LOWER(Department) = LOWER(@department))
-                                AND (@expenseHead IS NULL OR LOWER(Expense_Head) = LOWER(@expenseHead))
-                        ";
-            var query = _context.Requisitions
-                .FromSqlRaw(rawSql, new NpgsqlParameter("keyword", NpgsqlTypes.NpgsqlDbType.Text) { Value = (object)keyword ?? DBNull.Value },
-                                       new NpgsqlParameter("department", NpgsqlTypes.NpgsqlDbType.Text) { Value = (object)department ?? DBNull.Value },
-                                       new NpgsqlParameter("expenseHead", NpgsqlTypes.NpgsqlDbType.Text) { Value = (object)expenseHead ?? DBNull.Value })
-                .AsQueryable();
+            var query = _context.Requisitions.Include(x => x.ApprovalFlow).AsQueryable();
 
-            // Additional filters based on method parameters
-            if (startDate.HasValue && startDate.Value != DateTime.MinValue)
-                query = query.Where(r => DateOnly.FromDateTime(r.RequestedDate) >= DateOnly.FromDateTime(startDate.Value));
-            if (endDate.HasValue && endDate.Value != DateTime.MinValue)
-                query = query.Where(r => DateOnly.FromDateTime(r.RequestedDate) <= DateOnly.FromDateTime(endDate.Value));
-            if (statusFilter?.Any() ?? false)
+            if (!string.IsNullOrEmpty(pageRequest?.Keyword))
             {
-                query = query.Where(r => statusFilter.Contains(r.Status));
-            }
-            if (typeFilter?.Any() ?? false)
-            {
-                query = query.Where(r => typeFilter.Contains(r.RequisitionType));
+                var helper = new EntitySearchHelper<Requisition>(_context);
+                query = helper.SearchEntity(pageRequest.Keyword);
             }
 
-            //Apply Sorting
-            var _sortByMappings = new Dictionary<string, Expression<Func<Requisition, object>>>(StringComparer.OrdinalIgnoreCase)
+            if (requestedStartDate.HasValue)
             {
-                {"Date", r => r.RequestedDate },
-                {"RequisitionType", r => r.RequisitionType },
-                {"Status", r => r.Status },
-                {"Category", r => r.ExpenseHead },
-                {"RequestedBy", r => r.Submitter.Name },
-                {"Department", r => r.Department }
-            };
+                query = query.Where(x => x.RequestedDate >= requestedStartDate.Value);
+            }
 
-            var sortBy = !string.IsNullOrWhiteSpace(pageRequest.SortBy) && _sortByMappings.ContainsKey(pageRequest.SortBy) ? pageRequest.SortBy : "Date";
-            var sortByExpression = _sortByMappings[sortBy];
-            query = pageRequest.IsAscending
-                ? query.OrderBy(sortByExpression)
-                : query.OrderByDescending(sortByExpression);
+            if (requestedEndDate.HasValue)
+            {
+                query = query.Where(x => x.RequestedDate <= requestedEndDate.Value);
+            }
+
+            if (status.HasValue)
+            {
+                query = query.Where(x => x.Status == status.Value);
+            }
+
+            if (minTotalAmount.HasValue)
+            {
+                query = query.Where(x => x.TotalAmount >= minTotalAmount.Value);
+            }
+
+            if (maxTotalAmount.HasValue)
+            {
+                query = query.Where(x => x.TotalAmount <= maxTotalAmount.Value);
+            }
+
+            // Apply submitter ID filter
+            if (submitterIds != null && submitterIds.Any())
+            {
+                query = query.Where(x => submitterIds.Contains(x.SubmitterId));
+            }
+
+            if (!string.IsNullOrEmpty(expenseHead))
+            {
+                query = query.Where(x => EF.Functions.ILike(x.ExpenseHead, $"%{expenseHead}%"));
+            }
+
+            if (requisitionType.HasValue)
+            {
+                query = query.Where(x => x.RequisitionType == requisitionType.Value);
+            }
+
+            if (!string.IsNullOrEmpty(department))
+            {
+                query = query.Where(x => EF.Functions.ILike(x.Department, $"%{department}%"));
+            }
+
+            query = query.OrderBy(x => x.RequestedDate);
 
             var totalItemsCount = await query.CountAsync();
-            var skip = (pageRequest.Page - 1) * pageRequest.PageSize;
-            var result = await query.Skip(skip).Take(pageRequest.PageSize).ToListAsync();
+
+            var result = usePaging
+                ? await query.Skip((pageRequest.Page - 1) * pageRequest.PageSize).Take(pageRequest.PageSize).ToListAsync()
+                : await query.ToListAsync();
+
             return result.ToPaginatedList(totalItemsCount, pageRequest.Page, pageRequest.PageSize);
         }
 

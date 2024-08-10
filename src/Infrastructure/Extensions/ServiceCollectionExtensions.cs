@@ -23,6 +23,7 @@ public static class ServiceCollectionExtensions
             .AddScoped<ICashAdvanceRepository, CashAdvanceRepository>()
             .AddScoped<IGrantRepository, GrantRepository>()
             .AddScoped<IPurchaseOrderRepository, PurchaseOrderRepository>()
+            .AddScoped<IVendorRepository, VendorRepository>()
             .AddScoped<IRequisitionRepository, RequisitionRepository>()
             .AddScoped<ISubmitterRepository, SubmitterRepository>()
             .AddScoped<IExpenseHeadRepository, ExpenseHeadRepository>();

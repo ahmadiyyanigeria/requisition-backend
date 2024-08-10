@@ -8,7 +8,8 @@ namespace Domain.Entities.Aggregates.GrantAggregate
     {
         public Guid GrantId { get; private set; }
         public Guid RequisitionId { get; private set; }
-        public Guid SubmitterId { get; private set; }
+        public Guid ProcessorId { get; private set; }
+        public string Notes { get; private set; } = default!;
         public decimal GrantAmount { get; private set; }
         public DateTime RequestedDate { get; private set; } = DateTime.UtcNow;
         public DateTime? DisbursedDate { get; private set; }
@@ -17,11 +18,12 @@ namespace Domain.Entities.Aggregates.GrantAggregate
 
         private Grant() { }
 
-        public Grant(Guid requisitionId, Guid submitterId, decimal grantAmount, BankAccount bankAccount)
+        public Grant(Guid requisitionId, Guid processorId, string note, decimal grantAmount, BankAccount bankAccount)
         {
             GrantId = Guid.NewGuid();
             RequisitionId = requisitionId;
-            SubmitterId = submitterId;
+            ProcessorId = processorId;
+            Notes = Notes;
             GrantAmount = grantAmount;
             BankAccount = bankAccount;
         }

@@ -9,7 +9,21 @@ public enum ExceptionCodes
     NullRequisitionItem,
     ExpenseHeadAlreadyExist,
     RequisitionNotFound,
+    BankDetailsNotProvided,
+    CashAdvanceNotFound,
+    CashAdvanceReimbursementNotFound,
+    CashAdvanceRetired,
+    CashAdvanceReimbursementPaid,
+    CashAdvanceNotDisbursed,
+    CashAdvanceNotInRequestState,
+    PurchaseOrderNotInRequestState,
+    PurchaseOrderNotFulfilled,
+    PurchaseOrderPaid,
+    InvalidRefundAmount,
+    InvalidDisbursedAmount,
+    InvalidReimbursementAmount,
     RejectNotesNull,
+    PurchaseOrderNotFound
     GrantAlreadyExist,
 
 }

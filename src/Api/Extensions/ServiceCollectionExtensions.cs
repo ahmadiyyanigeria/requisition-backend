@@ -1,6 +1,7 @@
 using Api.Filters;
 using Application.Behaviours;
 using Application.Extensions;
+using Domain.Entities.Aggregates.PurchaseOrderAggregate;
 using FluentValidation;
 using Mapster;
 using MapsterMapper;
@@ -14,6 +15,7 @@ using Microsoft.OpenApi.Models;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using static Application.Queries.GetPurchaseOrder;
 
 namespace Api.Extensions;
 
