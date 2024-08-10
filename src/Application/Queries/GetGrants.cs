@@ -10,19 +10,9 @@ namespace Application.Queries
     public class GetGrants
     {
         public record Query(bool UsePaging = true) : PageRequest, IRequest<List<GrantResponse>>;
-        
 
-        public record GrantResponse
-        {
-            public Guid GrantId { get; private set; }
-            public Guid RequisitionId { get; private set; }
-            public Guid SubmitterId { get; private set; }
-            public decimal GrantAmount { get; private set; }
-            public DateTime RequestedDate { get; private set; }
-            public DateTime? DisbursedDate { get; private set; }
-            public BankAccount BankAccount { get; private set; } = default!;
-            public GrantStatus Status { get; private set; }
-        }
+
+        public record GrantResponse(Guid GrantId, Guid RequisitionId, Guid ProcessorId, string Notes, decimal GrantAmount, GrantStatus Status, BankAccount BankAccount);
 
         public class Handler : IRequestHandler<Query, List<GrantResponse>>
         {

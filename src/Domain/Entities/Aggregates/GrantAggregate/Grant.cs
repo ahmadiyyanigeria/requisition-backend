@@ -23,7 +23,7 @@ namespace Domain.Entities.Aggregates.GrantAggregate
             GrantId = Guid.NewGuid();
             RequisitionId = requisitionId;
             ProcessorId = processorId;
-            Notes = Notes;
+            Notes = note;
             GrantAmount = grantAmount;
             BankAccount = bankAccount;
         }

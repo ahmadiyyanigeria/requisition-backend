@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Application.Exceptions;
 using ApplicationException = Application.Exceptions.ApplicationException;
 using Domain.Entities.ValueObjects;
+using Mapster;
 
 namespace Application.Queries
 {
@@ -35,22 +36,10 @@ namespace Application.Queries
                     throw new ApplicationException($"Grant with Id {request.Id} does not exists", ExceptionCodes.GrantNotFound.ToString(), 404);
                 }
 
-                var grantResponse = new GrantResponse();
-
-                return grantResponse;
+                return grant.Adapt<GrantResponse>();
             }
         }
 
-        public record GrantResponse
-        {
-            public Guid GrantId { get; private set; }
-            public Guid RequisitionId { get; private set; }
-            public Guid SubmitterId { get; private set; }
-            public decimal GrantAmount { get; private set; }
-            public DateTime RequestedDate { get; private set; }
-            public DateTime? DisbursedDate { get; private set; }
-            public BankAccount BankAccount { get; private set; } = default!;
-            public GrantStatus Status { get; private set; }
-        }
+        public record GrantResponse(Guid GrantId, Guid RequisitionId, Guid ProcessorId, string Notes, decimal GrantAmount, GrantStatus Status, BankAccount BankAccount);
     }
 }
