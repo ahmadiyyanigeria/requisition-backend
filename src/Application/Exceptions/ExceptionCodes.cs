@@ -10,5 +10,6 @@ public enum ExceptionCodes
     ExpenseHeadAlreadyExist,
     RequisitionNotFound,
     RejectNotesNull,
+    GrantNotFound,
 
 }

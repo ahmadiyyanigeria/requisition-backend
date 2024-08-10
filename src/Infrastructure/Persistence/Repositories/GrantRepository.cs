@@ -1,5 +1,6 @@
 ﻿using Application.Repositories;
 using Domain.Entities.Aggregates.GrantAggregate;
+using Domain.Entities.Common;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Repositories
@@ -22,6 +23,11 @@ namespace Infrastructure.Persistence.Repositories
         public async Task<Grant?> GetByIdAsync(Guid grantId)
         {
             return await _context.Grants.FirstOrDefaultAsync(g => g.GrantId == grantId);
+        }
+
+        public async Task<IReadOnlyList<Grant>> GetAllAsync()
+        {
+            return await _context.Grants.ToListAsync();
         }
     }
 }
