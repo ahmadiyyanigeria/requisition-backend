@@ -58,10 +58,5 @@ namespace Infrastructure.Persistence.Repositories
                 return result.ToPaginatedList(totalItemsCount, 1, totalItemsCount);
             }
         }
-
-        public async Task<IReadOnlyList<Grant>> GetAllAsync()
-        {
-            return await _context.Grants.ToListAsync();
-        }
     }
 }

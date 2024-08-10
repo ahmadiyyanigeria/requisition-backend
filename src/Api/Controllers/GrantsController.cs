@@ -31,7 +31,7 @@ namespace Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetGrants([FromQuery] bool? usePaging, [FromQuery] GetPaginatedRequisitions.Query query)
+        public async Task<IActionResult> GetGrants([FromQuery] bool? usePaging, [FromQuery] GetGrants.Query query)
         {
             if (usePaging.HasValue && usePaging.Value)
             {

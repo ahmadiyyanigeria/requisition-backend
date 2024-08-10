@@ -1,4 +1,5 @@
-﻿using Application.Repositories;
+﻿using Application.Paging;
+using Application.Repositories;
 using Domain.Entities.ValueObjects;
 using Domain.Enums;
 using Mapster;
@@ -8,10 +9,8 @@ namespace Application.Queries
 {
     public class GetGrants
     {
-        public record Query : IRequest<List<GrantResponse>>
-        {
-           
-        }
+        public record Query(bool UsePaging = true) : PageRequest, IRequest<List<GrantResponse>>;
+        
 
         public record GrantResponse
         {
@@ -35,7 +34,7 @@ namespace Application.Queries
             }
             public async Task<List<GrantResponse>> Handle(Query request, CancellationToken cancellationToken)
             {
-                var grants = await _grantRepository.GetAllAsync();
+                var grants = await _grantRepository.GetGrants(request, request.UsePaging);
                 return grants.Adapt<List<GrantResponse>>();
             }
         }
