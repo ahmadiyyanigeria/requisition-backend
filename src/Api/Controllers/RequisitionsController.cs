@@ -18,17 +18,17 @@ namespace Api.Controllers
             _mediator = mediator;
         }
 
-        [HttpPost("submit")]
+        [HttpPost]
         public async Task<IActionResult> CreateRequisition([FromBody] CreateRequisitionCommand command)
         {
             var requisition = await _mediator.Send(command);
             return CreatedAtAction(nameof(CreateRequisition), new { id = requisition }, requisition);
         }
 
-        [HttpPatch("{requisitionId}/process")]
-        public async Task<IActionResult> ProcessRequisition([FromRoute] Guid requisitionId, [FromBody] ProcessRequisitionCommand command)
+        [HttpPatch("{id:guid}")]
+        public async Task<IActionResult> ProcessRequisition([FromRoute] Guid id, [FromBody] ProcessRequisitionCommand command)
         {
-            command.RequisitionId = requisitionId;
+            command.RequisitionId = id;
             var result = await _mediator.Send(command);
             return Ok(result);
         }

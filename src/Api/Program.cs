@@ -24,6 +24,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSwagger();
+builder.Services.AddHttpClient();
 builder.Services.ConfigureApiVersioning();
 builder.Services.ConfigureMvc();
 builder.Services.AddHealthChecks();
