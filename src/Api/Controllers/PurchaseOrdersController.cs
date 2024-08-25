@@ -2,7 +2,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using static Application.Commands.CreatePurchaseOrder;
-using static Application.Commands.DisburseCashAdvance;
 using static Application.Commands.FulfilPurchaseOrder;
 using static Application.Commands.PayPurchaseOrder;
 
@@ -19,18 +18,18 @@ namespace Api.Controllers
             _mediator = mediator;
         }
 
-        [HttpPost("generate")]
-        public async Task<IActionResult> GeneratePurchaseOrder([FromBody] CreatePurchaseOrderCommand command)
+        [HttpPost]
+        public async Task<IActionResult> CreatePurchaseOrder([FromBody] CreatePurchaseOrderCommand command)
         {
             var purchaseOrder = await _mediator.Send(command);
-            return CreatedAtAction(nameof(GeneratePurchaseOrder), new { id = purchaseOrder }, purchaseOrder);
+            return CreatedAtAction(nameof(GetPurchaseOrder), new { id = purchaseOrder }, purchaseOrder);
         }
 
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetPurchaseOrder(Guid id)
         {
-            var request = await _mediator.Send(new GetPurchaseOrder.Query { Id = id });
-            return Ok(request);
+            var purchaseOrder = await _mediator.Send(new GetPurchaseOrder.Query { Id = id });
+            return Ok(purchaseOrder);
         }
 
         [HttpGet]
@@ -40,16 +39,16 @@ namespace Api.Controllers
             return Ok(purchaseOrders);
         }
 
-        [HttpPatch("{id}/fulfill")]
-        public async Task<IActionResult> FulfillPurchaseOrder([FromRoute] Guid id, [FromBody] FulfilPurchaseOrderCommand command)
+        [HttpPatch("{id:guid}/fulfilment")]
+        public async Task<IActionResult> UpdatePurchaseOrderStatus([FromRoute] Guid id, [FromBody] FulfilPurchaseOrderCommand command)
         {
             command.PurchaseOrderId = id;
             var purchaseOrder = await _mediator.Send(command);
             return Ok(purchaseOrder);
         }
 
-        [HttpPatch("{id}/pay")]
-        public async Task<IActionResult> PayPurchaseOrder([FromRoute] Guid id, [FromBody] PayPurchaseOrderCommand command)
+        [HttpPatch("{id:guid}/payment")]
+        public async Task<IActionResult> UpdatePurchaseOrderPayment([FromRoute] Guid id, [FromBody] PayPurchaseOrderCommand command)
         {
             command.PurchaseOrderId = id;
             var purchaseOrder = await _mediator.Send(command);

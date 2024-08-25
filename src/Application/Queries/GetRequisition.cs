@@ -35,7 +35,7 @@ namespace Application.Queries
                 }
 
                 var approvalList = requisition.ApprovalFlow.ApproverSteps
-                .Select(step => new Approval(step.Role, step.Status.ToString())).ToList();
+                .Select(step => new Approval(step.Role, step.Status.ToString(), step.Notes)).ToList();
 
                 var submitterName = requisition.Submitter.Name;
                 var items = requisition.Items.Select(a => new Item(a.Description, a.UnitPrice, a.Quantity, a.TotalPrice)).ToList();
@@ -47,7 +47,7 @@ namespace Application.Queries
         }
         public record RequisitionResponse(Guid RequisitionId, string SubmitterName, string Description, string ExpenseHead, RequisitionStatus Status, DateTime RequestedDate, DateTime? ApprovedDate, DateTime? RejectedDate, DateTime? LastDateModified, decimal TotalAmount, IReadOnlyList<Approval> ApprovalList,RequisitionType RequisitionType, string Department,IReadOnlyList<Item> Items, IReadOnlyList<Attachment> Attachments);
 
-        public record Approval(string Role, string Status);
+        public record Approval(string Role, string Status, string? Comment);
 
         public record Item(string Description, decimal UnitPrice, int Quantity, decimal TotalPrice);
     }
