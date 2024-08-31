@@ -4,6 +4,7 @@ using Application.Services;
 using Infrastructure.Authentication;
 using Infrastructure.Common.Exports;
 using Infrastructure.Persistence.Repositories;
+using Infrastructure.Services.Bank;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,6 +35,7 @@ public static class ServiceCollectionExtensions
         return serviceCollection
             .AddScoped<IApprovalFlowService, ApprovalFlowService>()
             .AddScoped<IUserService, UserService>()
+            .AddScoped<IBankService, PaystackBankService>()
             .AddScoped<IReportExportService, ReportExportService>()
             .AddScoped<ICurrentUser, CurrentUser>()
             .AddSingleton<PdfReportGeneratorFactory>();
