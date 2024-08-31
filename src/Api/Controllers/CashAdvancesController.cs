@@ -66,7 +66,7 @@ namespace Api.Controllers
             return Ok(cashAdvance);
         }
 
-        [HttpPatch("{id}/reimbursement")]
+        [HttpPatch("{id}/reimburse")]
         public async Task<IActionResult> AddReimbursementEntry([FromRoute] Guid id, [FromBody]ReimburseCashAdvanceCommand command)
         {
             command.CashAdvanceId = id;
