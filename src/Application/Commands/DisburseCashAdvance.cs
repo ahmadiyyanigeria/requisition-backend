@@ -1,5 +1,5 @@
 ﻿using Application.Common.Interfaces;
-using Application.Repositories;
+using Domain.Repositories;
 using Domain.Entities.Aggregates.CashAdvanceAggregate;
 using Domain.Entities.ValueObjects;
 using Domain.Enums;

@@ -1,4 +1,4 @@
-﻿using Application.Repositories;
+﻿using Domain.Repositories;
 using MediatR;
 
 namespace Application.Queries

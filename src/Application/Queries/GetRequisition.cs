@@ -1,4 +1,4 @@
-﻿using Application.Repositories;
+﻿using Domain.Repositories;
 using Domain.Enums;
 using Domain.Entities.Common;
 using MediatR;
@@ -40,12 +40,12 @@ namespace Application.Queries
                 var submitterName = requisition.Submitter.Name;
                 var items = requisition.Items.Select(a => new Item(a.Description, a.UnitPrice, a.Quantity, a.TotalPrice)).ToList();
 
-                var requisitionResponse = new RequisitionResponse(requisition.RequisitionId, submitterName, requisition.Description, requisition.ExpenseHead, requisition.Status, requisition.RequestedDate, requisition.ApprovedDate, requisition.RejectedDate, requisition.LastDateModified, requisition.TotalAmount, approvalList, requisition.RequisitionType, requisition.Department, items, requisition.Attachments);
+                var requisitionResponse = new RequisitionResponse(requisition.RequisitionId, requisition.RequisitionNumber, submitterName, requisition.Description, requisition.ExpenseHeadName, requisition.Status, requisition.RequestedDate, requisition.ApprovedDate, requisition.RejectedDate, requisition.LastDateModified, requisition.TotalAmount, approvalList, requisition.RequisitionType, requisition.Department, items, requisition.Attachments);
 
                 return requisitionResponse;
             }
         }
-        public record RequisitionResponse(Guid RequisitionId, string SubmitterName, string Description, string ExpenseHead, RequisitionStatus Status, DateTime RequestedDate, DateTime? ApprovedDate, DateTime? RejectedDate, DateTime? LastDateModified, decimal TotalAmount, IReadOnlyList<Approval> ApprovalList,RequisitionType RequisitionType, string Department,IReadOnlyList<Item> Items, IReadOnlyList<Attachment> Attachments);
+        public record RequisitionResponse(Guid RequisitionId, string RequisitionNumber, string SubmitterName, string Description, string ExpenseHead, RequisitionStatus Status, DateTime RequestedDate, DateTime? ApprovedDate, DateTime? RejectedDate, DateTime? LastDateModified, decimal TotalAmount, IReadOnlyList<Approval> ApprovalList,RequisitionType RequisitionType, string Department,IReadOnlyList<Item> Items, IReadOnlyList<Attachment> Attachments);
 
         public record Approval(string Role, string Status, string? Comment);
 

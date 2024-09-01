@@ -1,7 +1,7 @@
-﻿using Application.Paging;
+﻿using Domain.Paging;
 using Domain.Entities.Aggregates.GrantAggregate;
 
-namespace Application.Repositories
+namespace Domain.Repositories
 {
     public interface IGrantRepository
     {

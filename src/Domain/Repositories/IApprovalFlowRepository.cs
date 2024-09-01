@@ -1,6 +1,6 @@
 ﻿using Domain.Entities.Aggregates.RequisitionAggregate;
 
-namespace Application.Repositories
+namespace Domain.Repositories
 {
     public interface IApprovalFlowRepository
     {

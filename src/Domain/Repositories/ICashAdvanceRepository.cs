@@ -1,8 +1,8 @@
-﻿using Application.Paging;
-using Domain.Entities.Aggregates.CashAdvanceAggregate;
+﻿using Domain.Entities.Aggregates.CashAdvanceAggregate;
 using Domain.Enums;
+using Domain.Paging;
 
-namespace Application.Repositories
+namespace Domain.Repositories
 {
     public interface ICashAdvanceRepository
     {

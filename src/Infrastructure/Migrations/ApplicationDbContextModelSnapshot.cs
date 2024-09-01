@@ -467,10 +467,9 @@ namespace Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("expense_account_id");
 
-                    b.Property<string>("ExpenseHead")
+                    b.Property<string>("ExpenseHeadName")
                         .IsRequired()
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("expense_head")
+                        .HasColumnType("varchar(50)")
                         .UseCollation("case_insensitive");
 
                     b.Property<DateTime?>("LastDateModified")
@@ -483,6 +482,12 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("RequestedDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("requested_date");
+
+                    b.Property<string>("RequisitionNumber")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("requisition_Number")
+                        .UseCollation("case_insensitive");
 
                     b.Property<string>("RequisitionType")
                         .IsRequired()
@@ -505,6 +510,8 @@ namespace Infrastructure.Migrations
                         .HasColumnName("total_amount");
 
                     b.HasKey("RequisitionId");
+
+                    b.HasIndex("ExpenseHeadName");
 
                     b.HasIndex("SubmitterId");
 
@@ -675,13 +682,11 @@ namespace Infrastructure.Migrations
                                 .UseCollation("case_insensitive");
 
                             b1.Property<string>("IBAN")
-                                .IsRequired()
                                 .HasColumnType("varchar(34)")
                                 .HasColumnName("iban")
                                 .UseCollation("case_insensitive");
 
                             b1.Property<string>("SWIFT")
-                                .IsRequired()
                                 .HasColumnType("varchar(11)")
                                 .HasColumnName("swift")
                                 .UseCollation("case_insensitive");
@@ -732,13 +737,11 @@ namespace Infrastructure.Migrations
                                 .UseCollation("case_insensitive");
 
                             b1.Property<string>("IBAN")
-                                .IsRequired()
                                 .HasColumnType("varchar(34)")
                                 .HasColumnName("iban")
                                 .UseCollation("case_insensitive");
 
                             b1.Property<string>("SWIFT")
-                                .IsRequired()
                                 .HasColumnType("varchar(11)")
                                 .HasColumnName("swift")
                                 .UseCollation("case_insensitive");
@@ -798,13 +801,11 @@ namespace Infrastructure.Migrations
                                 .UseCollation("case_insensitive");
 
                             b1.Property<string>("IBAN")
-                                .IsRequired()
                                 .HasColumnType("varchar(34)")
                                 .HasColumnName("iban")
                                 .UseCollation("case_insensitive");
 
                             b1.Property<string>("SWIFT")
-                                .IsRequired()
                                 .HasColumnType("varchar(11)")
                                 .HasColumnName("swift")
                                 .UseCollation("case_insensitive");
@@ -879,6 +880,13 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Aggregates.RequisitionAggregate.Requisition", b =>
                 {
+                    b.HasOne("Domain.Entities.Common.ExpenseHead", "ExpenseHead")
+                        .WithMany()
+                        .HasForeignKey("ExpenseHeadName")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_expense_head");
+
                     b.HasOne("Domain.Entities.Aggregates.SubmitterAggregate.Submitter", "Submitter")
                         .WithMany()
                         .HasForeignKey("SubmitterId")
@@ -909,13 +917,11 @@ namespace Infrastructure.Migrations
                                 .UseCollation("case_insensitive");
 
                             b1.Property<string>("IBAN")
-                                .IsRequired()
                                 .HasColumnType("varchar(34)")
                                 .HasColumnName("iban")
                                 .UseCollation("case_insensitive");
 
                             b1.Property<string>("SWIFT")
-                                .IsRequired()
                                 .HasColumnType("varchar(11)")
                                 .HasColumnName("swift")
                                 .UseCollation("case_insensitive");
@@ -929,6 +935,8 @@ namespace Infrastructure.Migrations
                         });
 
                     b.Navigation("BankAccount");
+
+                    b.Navigation("ExpenseHead");
 
                     b.Navigation("Submitter");
                 });

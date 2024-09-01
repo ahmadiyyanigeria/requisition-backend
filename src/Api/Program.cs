@@ -1,6 +1,7 @@
 using Api.Extensions;
 using Application.Commands;
 using Application.Configurations;
+using FluentValidation;
 using Infrastructure.Extensions;
 using Prometheus;
 using Serilog;
@@ -30,6 +31,7 @@ builder.Services.ConfigureMvc();
 builder.Services.AddHealthChecks();
 builder.Services.AddMapster();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(typeof(CreateRequisition).Assembly));
+builder.Services.AddValidatorsFromAssemblyContaining<RequisitionItemDtoValidator>();
 builder.Services.AddValidators();
 
 // Configure Authentication

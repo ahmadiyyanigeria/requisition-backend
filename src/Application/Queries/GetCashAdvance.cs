@@ -1,5 +1,5 @@
 ﻿
-using Application.Repositories;
+using Domain.Repositories;
 using Domain.Entities.ValueObjects;
 using Domain.Enums;
 using Domain.Exceptions;

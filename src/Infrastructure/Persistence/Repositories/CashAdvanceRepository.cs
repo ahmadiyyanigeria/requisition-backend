@@ -1,8 +1,7 @@
-﻿using Application.Paging;
-using Application.Repositories;
-using Domain.Entities.Aggregates.CashAdvanceAggregate;
-using Domain.Entities.Aggregates.RequisitionAggregate;
+﻿using Domain.Entities.Aggregates.CashAdvanceAggregate;
 using Domain.Enums;
+using Domain.Paging;
+using Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Repositories

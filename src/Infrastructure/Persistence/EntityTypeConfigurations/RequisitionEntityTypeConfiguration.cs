@@ -20,17 +20,22 @@ namespace Infrastructure.Persistence.EntityTypeConfigurations
             builder.Property(e => e.SubmitterId)
                 .IsRequired()
                 .HasColumnName("submitter_id")
-                .HasColumnType("uuid"); 
+                .HasColumnType("uuid");
+
+            builder.Property(e => e.RequisitionNumber)
+                .IsRequired()
+                .HasColumnName("requisition_Number")
+                .HasColumnType("varchar(50)");
 
             builder.Property(e => e.Description)
                 .IsRequired()
                 .HasColumnName("description")
-                .HasColumnType("text"); 
+                .HasColumnType("text");
 
-            builder.Property(e => e.ExpenseHead)
-                .IsRequired()
-                .HasColumnName("expense_head")
-                .HasColumnType("varchar(100)"); 
+            builder.HasOne(po => po.ExpenseHead)
+                .WithMany()
+                .HasForeignKey(po => po.ExpenseHeadName)
+                .HasConstraintName("fk_expense_head"); 
 
             builder.Property(e => e.Status)
                 .IsRequired()

@@ -1,8 +1,8 @@
-﻿using Application.Paging;
+﻿using Domain.Paging;
 using Domain.Entities.Aggregates.PurchaseOrderAggregate;
 using Domain.Enums;
 
-namespace Application.Repositories
+namespace Domain.Repositories
 {
     public interface IPurchaseOrderRepository
     {
