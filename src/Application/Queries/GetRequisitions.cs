@@ -21,7 +21,7 @@ namespace Application.Queries
             public string? Department { get; set; }
         }
 
-        public record RequisitionResponse(Guid RequisitionId, string RequisitionNumber, string SubmitterName, string ExpenseHead, RequisitionStatus Status, DateTime RequestedDate, decimal TotalAmount, RequisitionType RequisitionType, string Department);
+        public record RequisitionResponse(Guid RequisitionId, string RequisitionNumber, string SubmitterName, string ExpenseHeadName, RequisitionStatus Status, DateTime RequestedDate, decimal TotalAmount, RequisitionType RequisitionType, string Department);
 
 
         public class Handler : IRequestHandler<Query, PaginatedList<RequisitionResponse>>
