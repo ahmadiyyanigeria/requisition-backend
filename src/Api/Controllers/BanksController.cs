@@ -24,7 +24,7 @@ namespace Api.Controllers
            
         }
 
-        [HttpGet("verify")]
+        [HttpPost]
         public async Task<IActionResult> VerifyBankAccount(string accountNumber, string bankCode)
         {
             var result = await _bankService.VerifyBankAccountAsync(accountNumber, bankCode);
