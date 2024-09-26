@@ -9,9 +9,11 @@ namespace Domain.Entities.Aggregates.RequisitionAggregate
     public class Requisition
     {
         public Guid RequisitionId { get; private set; } = Guid.NewGuid();
+        public string RequisitionNumber { get; private set; } = default!;
         public Guid SubmitterId { get; private set; } = default!; 
         public string Description { get; private set; } = default!;
-        public string ExpenseHead { get; private set; } = default!;
+        public string ExpenseHeadName { get; private set; } = default!;
+        public ExpenseHead ExpenseHead { get; private set; } = default!;
         public RequisitionStatus Status { get; private set; } = RequisitionStatus.Draft;
         public DateTime RequestedDate { get; private set; } = DateTime.UtcNow;
         public DateTime? ApprovedDate { get; private set; }
@@ -33,14 +35,15 @@ namespace Domain.Entities.Aggregates.RequisitionAggregate
 
         private Requisition() { }
 
-        public Requisition(Guid submitterId, string description, string expenseHead, RequisitionType requisitionType, BankAccount? bankAccount, string department)
+        public Requisition(Guid submitterId, string description, string expenseHead, RequisitionType requisitionType, BankAccount? bankAccount, string department, string requisitionNumber)
         {
             SubmitterId = submitterId;
             Description = description;
-            ExpenseHead = expenseHead;
+            ExpenseHeadName = expenseHead;
             RequisitionType = requisitionType;
             BankAccount = bankAccount;
-            Department = department ?? "Default Department";           
+            Department = department;
+            RequisitionNumber = requisitionNumber;
         }
 
         public void AddItem(RequisitionItem item)

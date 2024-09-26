@@ -1,5 +1,5 @@
 ﻿using Application.Common.Interfaces;
-using Application.Repositories;
+using Domain.Repositories;
 using MediatR;
 using Application.Exceptions;
 using ApplicationException = Application.Exceptions.ApplicationException;

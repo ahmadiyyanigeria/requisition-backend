@@ -1,5 +1,5 @@
-﻿using Application.Paging;
-using Application.Repositories;
+﻿using Domain.Paging;
+using Domain.Repositories;
 using Domain.Entities.ValueObjects;
 using Domain.Enums;
 using Mapster;

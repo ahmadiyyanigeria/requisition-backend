@@ -1,5 +1,5 @@
-﻿using Application.Paging;
-using Application.Repositories;
+﻿using Domain.Paging;
+using Domain.Repositories;
 using Domain.Entities.Aggregates.SubmitterAggregate;
 using Microsoft.EntityFrameworkCore;
 

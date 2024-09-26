@@ -1,11 +1,8 @@
-﻿using Application.Paging;
-using Application.Repositories;
-using Domain.Entities.Aggregates.CashAdvanceAggregate;
-using Domain.Entities.Aggregates.RequisitionAggregate;
+﻿using Domain.Entities.Aggregates.RequisitionAggregate;
 using Domain.Enums;
+using Domain.Paging;
+using Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
-using Npgsql;
-using System.Linq.Expressions;
 
 namespace Infrastructure.Persistence.Repositories
 {
@@ -36,7 +33,11 @@ namespace Infrastructure.Persistence.Repositories
                 .Include(r => r.Submitter)
                 .ToListAsync();
         }
-
+        public async Task<bool> RequisitionNumberExistsAsync(string requisitionNumber)
+        {
+            return await _context.Requisitions
+                .AnyAsync(r => r.RequisitionNumber == requisitionNumber);
+        }
 
         public async Task<IReadOnlyList<Requisition>> GetAllAsync(DateTime? startDate = null, DateTime? endDate = null)
         {
@@ -98,7 +99,7 @@ namespace Infrastructure.Persistence.Repositories
 
             if (!string.IsNullOrEmpty(expenseHead))
             {
-                query = query.Where(x => EF.Functions.ILike(x.ExpenseHead, $"%{expenseHead}%"));
+                query = query.Where(x => EF.Functions.ILike(x.ExpenseHeadName, $"%{expenseHead}%"));
             }
 
             if (requisitionType.HasValue)

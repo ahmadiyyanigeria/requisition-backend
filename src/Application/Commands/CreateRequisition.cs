@@ -1,6 +1,5 @@
 ﻿using Application.Common.Interfaces;
 using Application.Helpers;
-using Application.Repositories;
 using Application.Services;
 using Domain.Entities.Aggregates.RequisitionAggregate;
 using Domain.Entities.Aggregates.SubmitterAggregate;
@@ -8,6 +7,8 @@ using Domain.Entities.Common;
 using Domain.Entities.ValueObjects;
 using Domain.Enums;
 using Domain.Exceptions;
+using Domain.Factories;
+using Domain.Repositories;
 using FluentValidation;
 using MediatR;
 using static Application.Commands.CreateRequisition;
@@ -17,48 +18,33 @@ namespace Application.Commands
 {
     public class CreateRequisition
     {
-        public class CreateRequisitionCommand : IRequest<Guid>
-        {
-            public string Description { get; init; } = default!; 
-            public string ExpenseHead { get; init; } = default!; 
-            public RequisitionType RequisitionType { get; init; }
-            public BankAccount? BankAccount { get; init; }
-            public IReadOnlyList<RequisitionItemDto> Items { get; set; } = null!;
-            public IReadOnlyList<AttachmentDto>? Attachments { get; set; }
-            public bool IsDraft { get; set; }  // Indicates if the submission is a draft
-        }
+        public record CreateRequisitionCommand(string Description, string ExpenseHead, RequisitionType RequisitionType, BankAccountDto? BankAccount, IReadOnlyList<RequisitionItemDto> Items, IReadOnlyList<AttachmentDto>? Attachments, bool IsDraft) : IRequest<RequisitionResponse>;
 
-        public class RequisitionItemDto
-        {
-            public string Description { get; init; } = default!;
-            public int Quantity { get; init; }
-            public decimal UnitPrice { get; init; }
-        }
+        public record RequisitionItemDto(string Description, int Quantity, decimal UnitPrice);
+        public record AttachmentDto(string FileName, string FileType, string FileUrl);
+        public record BankAccountDto(string AccountNumber, string BankName, string AccountName, string? IBAN, string? SWIFT);
 
-        public class AttachmentDto
-        {
-            public required string FileName { get; init; } = default!;
-            public required string FileType { get; init; } = default!;
-            public required string FileUrl { get; init; }
-        }
-
-        public class Handler : IRequestHandler<CreateRequisitionCommand, Guid>
+        public class Handler : IRequestHandler<CreateRequisitionCommand, RequisitionResponse>
         {
             private readonly IRequisitionRepository _requisitionRepository;
             private readonly ISubmitterRepository _submitterRepository;
             private readonly IUnitOfWork _unitOfWork;
             private readonly IApprovalFlowService _approvalFlowService;
             private readonly ICurrentUser _user;
-            public Handler(IRequisitionRepository requisitionRepository, ISubmitterRepository submitterRepository, IUnitOfWork unitOfWork, IApprovalFlowService approvalFlowService, ICurrentUser user)
+            private readonly IRequisitionFactory _requisitionFactory;
+            private readonly IExpenseHeadRepository _expenseHeadRepository;
+            public Handler(IRequisitionRepository requisitionRepository, ISubmitterRepository submitterRepository, IUnitOfWork unitOfWork, IApprovalFlowService approvalFlowService, ICurrentUser user, IRequisitionFactory requisitionFactory, IExpenseHeadRepository expenseHeadRepository)
             {
                 _requisitionRepository = requisitionRepository;
                 _submitterRepository = submitterRepository;
                 _unitOfWork = unitOfWork;
                 _approvalFlowService = approvalFlowService;
                 _user = user;
+                _requisitionFactory = requisitionFactory;
+                _expenseHeadRepository = expenseHeadRepository;
             }
 
-            public async Task<Guid> Handle(CreateRequisitionCommand request, CancellationToken cancellationToken)
+            public async Task<RequisitionResponse> Handle(CreateRequisitionCommand request, CancellationToken cancellationToken)
             {
                 //get current logged in user //userId, userrole, name, department, email, phonenumber
                 var user = _user.GetUserDetails();
@@ -67,19 +53,27 @@ namespace Application.Commands
                 //create submitter record
                 var submitter = new Submitter(user.UserId, user.Name, user.Email, user.Role, department);
 
-                if((request.RequisitionType is RequisitionType.CashAdvance or RequisitionType.Grant) && request.BankAccount is null)
+                //validate expense head
+                var expensehead = await _expenseHeadRepository.GetByNameAsync(request.ExpenseHead);
+                if (expensehead is null)
                 {
-                    throw new ApplicationException($"Bank account details not provided.", ExceptionCodes.BankDetailsNotProvided.ToString(), 400);
+                    throw new ApplicationException($"Invalid expense head.", ExceptionCodes.InvalidExpenseHead.ToString(), 400);
+                }
+
+                // Validate BankAccount if required
+                BankAccount? bankData = null;
+                if (request.RequisitionType is RequisitionType.CashAdvance or RequisitionType.Grant)
+                {
+                    if (request.BankAccount is null)
+                    {
+                        throw new ApplicationException($"Bank account details not provided.", ExceptionCodes.BankDetailsNotProvided.ToString(), 400);
+                    }
+                    bankData = new BankAccount(request.BankAccount.AccountNumber, request.BankAccount.BankName, request.BankAccount.AccountName, request.BankAccount.IBAN, request.BankAccount.SWIFT);
                 }
 
                 //creating the requisition object
-                var requisition = new Requisition(
-                    submitter.SubmitterId,
-                    request.Description,
-                    request.ExpenseHead,
-                    request.RequisitionType,
-                    request.BankAccount,
-                    department);
+                var requisition = await _requisitionFactory.Create(submitter.SubmitterId, request.Description,
+                    request.ExpenseHead, request.RequisitionType, bankData, department);
 
                 foreach (var item in request.Items)
                 {
@@ -111,10 +105,23 @@ namespace Application.Commands
                 await _requisitionRepository.AddAsync(requisition);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                return requisition.RequisitionId;
+                var approvalList = requisition.ApprovalFlow.ApproverSteps
+                .Select(step => new Approval(step.Role, step.Status.ToString(), step.Notes)).ToList();
+
+                var items = requisition.Items.Select(a => new Item(a.Description, a.UnitPrice, a.Quantity, a.TotalPrice)).ToList();
+
+                var requisitionResponse = new RequisitionResponse(requisition.RequisitionId, requisition.RequisitionNumber, submitter.Name, requisition.Description, requisition.ExpenseHeadName, requisition.Status, requisition.RequestedDate, requisition.ApprovedDate, requisition.RejectedDate, requisition.LastDateModified, requisition.TotalAmount, approvalList, requisition.RequisitionType, requisition.Department, items, requisition.Attachments);
+
+                return requisitionResponse;
             }
         }
     }
+
+    public record RequisitionResponse(Guid RequisitionId, string RequisitionNumber, string SubmitterName, string Description, string ExpenseHead, RequisitionStatus Status, DateTime RequestedDate, DateTime? ApprovedDate, DateTime? RejectedDate, DateTime? LastDateModified, decimal TotalAmount, IReadOnlyList<Approval> ApprovalList, RequisitionType RequisitionType, string Department, IReadOnlyList<Item> Items, IReadOnlyList<Attachment> Attachments);
+
+    public record Approval(string Role, string Status, string? Comment);
+
+    public record Item(string Description, decimal UnitPrice, int Quantity, decimal TotalPrice);
 
     public class CommandValidator : AbstractValidator<CreateRequisitionCommand>
     {
@@ -122,13 +129,11 @@ namespace Application.Commands
         {
             RuleFor(x => x.Description)
                 .NotEmpty().WithMessage("Description is required.")
-                .MaximumLength(500).WithMessage("Description cannot exceed 500 characters.")
                 .Must(ScriptContentValidator.NotContainScript).WithMessage("Description contains invalid characters.");
 
             RuleFor(x => x.ExpenseHead)
-                .NotEmpty().WithMessage("ExpenseHead is required.")
-                .MaximumLength(50).WithMessage("ExpenseHead cannot exceed 500 characters.")
-                .Must(ScriptContentValidator.NotContainScript).WithMessage("ExpenseHead contains invalid characters.");
+                .NotEmpty().WithMessage("Expense head is required.")
+                .Must(ScriptContentValidator.NotContainScript).WithMessage("Expense head contains invalid characters.");
 
             RuleFor(x => x.RequisitionType)
                 .IsInEnum().WithMessage("Invalid requisition type.");
@@ -140,7 +145,16 @@ namespace Application.Commands
 
             RuleForEach(x => x.Items).SetValidator(new RequisitionItemDtoValidator());
 
-            RuleForEach(x => x.Attachments).SetValidator(new AttachmentDtoValidator());
+            When(x => x.Attachments != null && x.Attachments.Any(), () =>
+            {
+                RuleForEach(x => x.Attachments).SetValidator(new AttachmentDtoValidator());
+            });
+
+            When(x => x.BankAccount != null, () =>
+            {
+                RuleFor(x => x.BankAccount)
+                    .SetValidator(new BankAccountValidator());
+            });
         }
     }
 
@@ -172,10 +186,35 @@ namespace Application.Commands
 
             RuleFor(x => x.FileType)
                 .NotEmpty().WithMessage("File type is required.")
+                .Must(fileType => AllowedFileTypes.Contains(fileType)).WithMessage("Invalid file type.")
                 .Must(ScriptContentValidator.NotContainScript).WithMessage("File type contains invalid characters.");
 
             RuleFor(x => x.FileUrl)
-                .NotEmpty().WithMessage("Attachment url is required.");
+                .NotEmpty().WithMessage("Attachment URL is required.");
+        }
+
+        private static readonly HashSet<string> AllowedFileTypes = new HashSet<string>
+        {
+            "image/jpeg",
+            "image/png",
+            "application/pdf",
+            "application/vnd.ms-excel",
+            // Add more allowed file types as necessary
+        };
+    }
+
+    public class BankAccountValidator : AbstractValidator<BankAccountDto>
+    {
+        public BankAccountValidator()
+        {
+            RuleFor(x => x.AccountNumber)
+                .NotEmpty().WithMessage("Bank account number is required.")
+                .Length(10).WithMessage("Bank account number must be 10 digits.");
+
+            RuleFor(x => x.BankName)
+                .NotEmpty().WithMessage("Bank name is required.")
+                .MaximumLength(100).WithMessage("Bank name cannot exceed 100 characters.");
         }
     }
+
 }

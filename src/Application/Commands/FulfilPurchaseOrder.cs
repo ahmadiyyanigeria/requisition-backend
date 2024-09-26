@@ -1,5 +1,5 @@
 ﻿using Application.Common.Interfaces;
-using Application.Repositories;
+using Domain.Repositories;
 using Domain.Entities.Aggregates.PurchaseOrderAggregate;
 using Domain.Enums;
 using Domain.Exceptions;
@@ -39,9 +39,9 @@ namespace Application.Commands
                     throw new ApplicationException($"Purchase order not found.", ExceptionCodes.PurchaseOrderNotFound.ToString(), 404);
                 }
 
-                if (purchaseOrder.Status != PurchaseOrderStatus.Requested)
+                if (purchaseOrder.Status == PurchaseOrderStatus.Fulfilled)
                 {
-                    throw new ApplicationException($"Purchase order not in request status.", ExceptionCodes.PurchaseOrderNotInRequestState.ToString(), 400);
+                    throw new ApplicationException($"Purchase order has already fulfilled.", ExceptionCodes.PurchaseOrderNotInRequestState.ToString(), 400);
                 }
 
                 if (purchaseOrder.Status == PurchaseOrderStatus.Paid)

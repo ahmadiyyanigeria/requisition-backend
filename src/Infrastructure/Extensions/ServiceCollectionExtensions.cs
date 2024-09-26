@@ -1,12 +1,14 @@
 using Application.Common.Interfaces;
-using Application.Repositories;
+using Domain.Repositories;
 using Application.Services;
 using Infrastructure.Authentication;
 using Infrastructure.Common.Exports;
 using Infrastructure.Persistence.Repositories;
+using Infrastructure.Services.Bank;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Domain.Factories;
 
 namespace Infrastructure.Extensions;
 
@@ -26,7 +28,8 @@ public static class ServiceCollectionExtensions
             .AddScoped<IVendorRepository, VendorRepository>()
             .AddScoped<IRequisitionRepository, RequisitionRepository>()
             .AddScoped<ISubmitterRepository, SubmitterRepository>()
-            .AddScoped<IExpenseHeadRepository, ExpenseHeadRepository>();
+            .AddScoped<IExpenseHeadRepository, ExpenseHeadRepository>()
+            .AddScoped<IRequisitionFactory, RequisitionFactory>();
     }
 
     public static IServiceCollection AddApplicationServices(this IServiceCollection serviceCollection)
@@ -34,6 +37,7 @@ public static class ServiceCollectionExtensions
         return serviceCollection
             .AddScoped<IApprovalFlowService, ApprovalFlowService>()
             .AddScoped<IUserService, UserService>()
+            .AddScoped<IBankService, PaystackBankService>()
             .AddScoped<IReportExportService, ReportExportService>()
             .AddScoped<ICurrentUser, CurrentUser>()
             .AddSingleton<PdfReportGeneratorFactory>();

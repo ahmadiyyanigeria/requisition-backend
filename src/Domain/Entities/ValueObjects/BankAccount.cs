@@ -4,7 +4,7 @@
         string AccountNumber,
         string BankName,
         string AccountName,
-        string IBAN,
-        string SWIFT
+        string? IBAN,
+        string? SWIFT
     );
 }

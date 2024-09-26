@@ -1,9 +1,8 @@
 ﻿using Application.Common.Interfaces;
-using Application.Paging;
-using Application.Repositories;
 using Domain.Constants;
-using Domain.Entities.Common;
 using Domain.Enums;
+using Domain.Paging;
+using Domain.Repositories;
 using Mapster;
 using MediatR;
 
@@ -16,23 +15,14 @@ namespace Application.Queries
             RequisitionStatus? Status = null,
             decimal? MinTotalAmount = null,
             decimal? MaxTotalAmount = null,
-            string? ExpenseHead = null,
+            string? ExpenseHead = null, 
             RequisitionType? RequisitionType = null) : PageRequest, IRequest<PaginatedList<RequisitionResponse>>
         {
-            public string? Department { get; set; } = null;
+            public string? Department { get; set; }
         }
 
-        public record RequisitionResponse
-        {
-            public Guid RequisitionId { get; set; }
-            public string SubmitterName { get; set; } = default!;
-            public string ExpenseHead { get; set; } = default!;
-            public RequisitionStatus Status { get; set; }
-            public DateTime RequestedDate { get; set; }
-            public decimal TotalAmount { get; set; }
-            public RequisitionType RequisitionType { get; set; }
-            public string Department { get; set; } = default!;
-        }
+        public record RequisitionResponse(Guid RequisitionId, string RequisitionNumber, string SubmitterName, string ExpenseHeadName, RequisitionStatus Status, DateTime RequestedDate, decimal TotalAmount, RequisitionType RequisitionType, string Department);
+
 
         public class Handler : IRequestHandler<Query, PaginatedList<RequisitionResponse>>
         {

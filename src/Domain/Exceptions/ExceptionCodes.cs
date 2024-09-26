@@ -10,6 +10,7 @@ public enum ExceptionCodes
     ExpenseHeadAlreadyExist,
     RequisitionNotFound,
     BankDetailsNotProvided,
+    InvalidExpenseHead,
     CashAdvanceNotFound,
     CashAdvanceReimbursementNotFound,
     CashAdvanceRetired,

@@ -1,4 +1,4 @@
-namespace Application.Paging;
+namespace Domain.Paging;
 
 public record PaginatedList<T> where T : notnull
 {

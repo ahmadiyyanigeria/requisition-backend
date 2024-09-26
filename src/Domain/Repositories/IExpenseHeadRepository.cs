@@ -1,6 +1,6 @@
 ﻿using Domain.Entities.Common;
 
-namespace Application.Repositories
+namespace Domain.Repositories
 {
     public interface IExpenseHeadRepository
     {

@@ -1,12 +1,13 @@
-﻿using Application.Paging;
+﻿using Domain.Paging;
 using Domain.Entities.Aggregates.RequisitionAggregate;
 using Domain.Enums;
 
-namespace Application.Repositories
+namespace Domain.Repositories
 {
     public interface IRequisitionRepository
     {
         Task<Requisition> AddAsync(Requisition requisition);
+        Task<bool> RequisitionNumberExistsAsync(string requisitionNumber);
         Task<Requisition> UpdateAsync(Requisition requisition);
         Task<Requisition?> GetByIdAsync(Guid requisitionId);
         Task<IReadOnlyList<Requisition>> GetAllAsync();

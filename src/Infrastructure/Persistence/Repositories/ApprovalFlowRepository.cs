@@ -1,5 +1,5 @@
-﻿using Application.Repositories;
-using Domain.Entities.Aggregates.RequisitionAggregate;
+﻿using Domain.Entities.Aggregates.RequisitionAggregate;
+using Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Repositories

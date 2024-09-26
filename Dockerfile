@@ -1,32 +1,37 @@
-#See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
-
+# Base image with ASP.NET Core runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 
-# Api
+# Build image with .NET SDK for building the app
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /
-# Copy solution files
+WORKDIR /src
+
+# Copy the project files and restore dependencies
 COPY ["src/Api/Api.csproj", "Api/"]
 COPY ["src/Application/Application.csproj", "Application/"]
 COPY ["src/Domain/Domain.csproj", "Domain/"]
 COPY ["src/Infrastructure/Infrastructure.csproj", "Infrastructure/"]
 RUN dotnet restore "Api/Api.csproj"
+
+# Copy the entire source code into the container and build it
 COPY ./src ./
+WORKDIR /src/Api
+RUN dotnet build "Api.csproj" -c Release -o /app/build
 
-WORKDIR /Api
-RUN dotnet build --no-restore "Api.csproj" -c Release -o /app/build
-
-# Publish Api release
+# Publish the application
 FROM build AS publish
-WORKDIR /Api
-RUN dotnet publish "Api.csproj" -c Release -o /app/publish
+RUN dotnet publish "Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
-# Build api runtime image
+# Final image with only the necessary runtime dependencies
 FROM base AS final
 WORKDIR /app
 ENV ASPNETCORE_URLS=http://*:8080
-COPY --from=publish /app/publish .
-EXPOSE 8080/tcp
-ENTRYPOINT ["dotnet", "Api.dll"]
 
+# Copy the published application into the runtime image
+COPY --from=publish /app/publish .
+
+# Expose the application port
+EXPOSE 8080/tcp
+
+# Set the entry point to run the application
+ENTRYPOINT ["dotnet", "Api.dll"]

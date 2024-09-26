@@ -1,4 +1,4 @@
-﻿using Application.Repositories;
+﻿using Domain.Repositories;
 using Domain.Entities.Aggregates.RequisitionAggregate;
 using Domain.Enums;
 using MediatR;
