@@ -1,7 +1,7 @@
 ﻿using Application.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using static Application.Commands.GenerateGrant;
+using static Application.Commands.CreateGrant;
 
 namespace Api.Controllers
 {

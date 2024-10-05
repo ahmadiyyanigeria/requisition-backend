@@ -1,24 +1,17 @@
 ﻿using Application.Common.Interfaces;
-using Application.Repositories;
-using Domain.Entities.Aggregates.CashAdvanceAggregate;
 using Domain.Entities.Aggregates.GrantAggregate;
 using Domain.Entities.Aggregates.SubmitterAggregate;
-using Domain.Entities.Common;
 using Domain.Entities.ValueObjects;
 using Domain.Enums;
 using Domain.Exceptions;
+using Domain.Repositories;
 using Mapster;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ApplicationException = Application.Exceptions.ApplicationException;
 
 namespace Application.Commands
 {
-    public class GenerateGrant
+    public class CreateGrant
     {
         public class GenerateGrantCommand : IRequest<GrantResponse>
         {

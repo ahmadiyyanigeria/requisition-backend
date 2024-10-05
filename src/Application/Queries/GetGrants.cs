@@ -1,7 +1,7 @@
-﻿using Application.Paging;
-using Application.Repositories;
-using Domain.Entities.ValueObjects;
+﻿using Domain.Entities.ValueObjects;
 using Domain.Enums;
+using Domain.Paging;
+using Domain.Repositories;
 using Mapster;
 using MediatR;
 
