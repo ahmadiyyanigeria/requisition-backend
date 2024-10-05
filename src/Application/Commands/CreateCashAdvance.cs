@@ -1,7 +1,6 @@
 ﻿using Application.Common.Interfaces;
 using Domain.Repositories;
 using Domain.Entities.Aggregates.CashAdvanceAggregate;
-using Domain.Entities.Aggregates.PurchaseOrderAggregate;
 using Domain.Entities.Aggregates.SubmitterAggregate;
 using Domain.Entities.ValueObjects;
 using Domain.Enums;

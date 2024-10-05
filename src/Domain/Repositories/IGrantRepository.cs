@@ -1,5 +1,6 @@
 ﻿using Domain.Paging;
 using Domain.Entities.Aggregates.GrantAggregate;
+using Domain.Entities.Common;
 
 namespace Domain.Repositories
 {

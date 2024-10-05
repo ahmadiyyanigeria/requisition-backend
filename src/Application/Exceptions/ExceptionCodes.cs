@@ -11,5 +11,6 @@ public enum ExceptionCodes
     VendorAlreadyExist,
     RequisitionNotFound,
     RejectNotesNull,
+    GrantNotFound,
 
 }

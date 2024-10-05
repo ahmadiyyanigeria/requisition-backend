@@ -2,6 +2,7 @@
 using Domain.Repositories;
 using Domain.Entities.Aggregates.GrantAggregate;
 using Domain.Entities.Aggregates.RequisitionAggregate;
+using Domain.Entities.Common;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Repositories
